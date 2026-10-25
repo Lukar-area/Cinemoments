@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" agent="Mozilla/5.0" version="24.0.0">
+  <diagram id="class_diag" name="Class Diagram">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="cl_400" value="CineMoments — UML 2.x Class Diagram (Domain Models, Services &amp; Controllers)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#1e293b;strokeColor=#3b82f6;fontColor=#ffffff;fontStyle=1;fontSize=15;size=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="15" width="780" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_401" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;User&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ name: String&amp;#xa;+ email: String [Unique]&amp;#xa;+ phone: String&amp;#xa;+ password_hash: String&amp;#xa;+ role: UserRole&amp;#xa;+ status: UserStatus&amp;#xa;+ wallet_balance: Decimal&amp;#xa;+ created_at: DateTime&amp;#xa;—&amp;#xa;+ verifyPassword(plain): Boolean&amp;#xa;+ deductWallet(amount): Boolean&amp;#xa;+ creditWallet(amount): Void&amp;#xa;+ hasRole(targetRole): Boolean" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#eff6ff;strokeColor=#3b82f6;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="240" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_402" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;Theatre&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ name: String&amp;#xa;+ location: String&amp;#xa;+ address: String&amp;#xa;+ city: String&amp;#xa;+ owner_id: Integer [FK]&amp;#xa;+ status: String&amp;#xa;+ created_at: DateTime&amp;#xa;—&amp;#xa;+ getScreens(): Screen[*]&amp;#xa;+ getAssignedStaff(): User[*]&amp;#xa;+ calculatePayout(share): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#fef2f2;strokeColor=#ef4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="340" y="80" width="230" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_403" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;Screen&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ theatre_id: Integer [FK]&amp;#xa;+ name: String&amp;#xa;+ capacity: Integer&amp;#xa;+ screen_type: ScreenType&amp;#xa;+ created_at: DateTime&amp;#xa;—&amp;#xa;+ getScheduledShows(): Show[*]" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#fef2f2;strokeColor=#ef4444;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="80" width="210" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_404" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;Movie&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ title: String&amp;#xa;+ poster: String&amp;#xa;+ duration: Integer&amp;#xa;+ language: String&amp;#xa;+ rating: String&amp;#xa;+ genre: String&amp;#xa;+ release_date: Date&amp;#xa;—&amp;#xa;+ getActiveShows(): Show[*]" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#fdf4ff;strokeColor=#c026d3;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="900" y="80" width="220" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_405" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;Show&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ movie_id: Integer [FK]&amp;#xa;+ screen_id: Integer [FK]&amp;#xa;+ show_date: Date&amp;#xa;+ start_time: String&amp;#xa;+ end_time: String&amp;#xa;+ interval_start: String&amp;#xa;+ interval_end: String&amp;#xa;+ price_estimate: Decimal&amp;#xa;+ status: ShowStatus&amp;#xa;—&amp;#xa;+ hasStarted(): Boolean&amp;#xa;+ isIntervalFree(): Boolean&amp;#xa;+ getIntervalSlot(): String" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#fdf4ff;strokeColor=#c026d3;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="280" width="230" height="210" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_406" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;IntervalBooking&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ user_id: Integer [FK]&amp;#xa;+ show_id: Integer [FK]&amp;#xa;+ booking_type: BookingType&amp;#xa;+ message: String&amp;#xa;+ contact_phone: String&amp;#xa;+ status: BookingStatus&amp;#xa;+ rejection_reason: String&amp;#xa;+ accepted_at: DateTime&amp;#xa;+ expires_at: DateTime&amp;#xa;—&amp;#xa;+ markAccepted(): Void&amp;#xa;+ markExpired(): Void&amp;#xa;+ markRejected(reason): Void&amp;#xa;+ canBeAccepted(): Boolean" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#fefce8;strokeColor=#ca8a04;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="340" y="320" width="240" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_407" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;BookingMedia&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ booking_id: Integer [FK]&amp;#xa;+ file_type: MediaType&amp;#xa;+ encrypted_file_path: String&amp;#xa;+ original_filename: String&amp;#xa;+ mime_type: String&amp;#xa;+ file_size: Integer&amp;#xa;+ iv: String (12-byte Hex)&amp;#xa;+ auth_tag: String (16-byte Hex)&amp;#xa;—&amp;#xa;+ getDecryptedStream(): Stream&amp;#xa;+ verifyIntegrity(): Boolean" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#4338ca;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="350" width="250" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_408" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;Transaction&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ booking_id: Integer [FK]&amp;#xa;+ user_id: Integer [FK]&amp;#xa;+ theatre_id: Integer [FK]&amp;#xa;+ total_amount: Decimal&amp;#xa;+ theatre_share: Decimal (80%)&amp;#xa;+ admin_share: Decimal (20%)&amp;#xa;+ status: TxStatus&amp;#xa;+ created_at: DateTime&amp;#xa;—&amp;#xa;+ processSplit(): Void&amp;#xa;+ executeRefund(): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="340" y="580" width="240" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_409" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;Notification&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ user_id: Integer [FK]&amp;#xa;+ booking_id: Integer [FK]&amp;#xa;+ title: String&amp;#xa;+ message: String&amp;#xa;+ type: NotifType&amp;#xa;+ is_read: Boolean&amp;#xa;+ created_at: DateTime&amp;#xa;—&amp;#xa;+ markAsRead(): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#ccfbf1;strokeColor=#0f766e;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_410" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;AuditLog&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ user_id: Integer [FK]&amp;#xa;+ action: String&amp;#xa;+ entity_type: String&amp;#xa;+ entity_id: Integer&amp;#xa;+ details: JSON&amp;#xa;+ ip_address: String&amp;#xa;+ created_at: DateTime&amp;#xa;—&amp;#xa;+ record(): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="780" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_411" value="&amp;lt;&amp;lt;entity&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;ChatMessage&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ id: Integer [PK]&amp;#xa;+ theatre_id: Integer [FK]&amp;#xa;+ user_id: Integer [FK]&amp;#xa;+ sender_id: Integer [FK]&amp;#xa;+ sender_role: UserRole&amp;#xa;+ message: String&amp;#xa;+ booking_id: Integer [FK]&amp;#xa;+ is_read: Boolean&amp;#xa;+ created_at: DateTime&amp;#xa;—&amp;#xa;+ markRead(): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#475569;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="630" y="540" width="230" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_412" value="&amp;lt;&amp;lt;controller&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;BookingController&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;&amp;#xa;&amp;#xa;—&amp;#xa;+ createBooking(req, res): Promise&amp;#xa;+ getBooking(req, res): Promise&amp;#xa;+ listBookings(req, res): Promise&amp;#xa;+ acceptBooking(req, res): Promise&amp;#xa;+ rejectBooking(req, res): Promise&amp;#xa;+ cancelBooking(req, res): Promise" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="80" width="260" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_413" value="&amp;lt;&amp;lt;service&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;BookingService&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;&amp;#xa;&amp;#xa;—&amp;#xa;+ createBooking(input): Object&amp;#xa;+ acceptBooking(id, staffId): Object&amp;#xa;+ rejectBooking(id, staffId, reason): Object&amp;#xa;+ cancelBooking(id, userId): Object&amp;#xa;+ refundBookingTransaction(db, id): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#fef08a;strokeColor=#ca8a04;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="280" width="270" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_414" value="&amp;lt;&amp;lt;service&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;CryptoService&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ ALGORITHM: String = &quot;aes-256-gcm&quot;&amp;#xa;+ KEY_LENGTH: Integer = 32&amp;#xa;+ IV_LENGTH: Integer = 12&amp;#xa;—&amp;#xa;+ validateMediaBuffer(buf, filename): Object&amp;#xa;+ encryptBuffer(buf): Object&amp;#xa;+ decryptBuffer(encBuf, iv, tag): Buffer&amp;#xa;+ streamDecryptedMedia(id, res): Stream" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#4338ca;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="480" width="270" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_415" value="&amp;lt;&amp;lt;service&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;NotificationService&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;&amp;#xa;&amp;#xa;—&amp;#xa;+ createNotification(user, bId, title, msg, type): Void&amp;#xa;+ getUserNotifications(userId): Notification[*]&amp;#xa;+ markAsRead(id, userId): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#ccfbf1;strokeColor=#0f766e;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="660" width="270" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_416" value="&amp;lt;&amp;lt;worker&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;ExpirationWorker&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;+ CHECK_INTERVAL_MS: Integer = 60000&amp;#xa;+ timerHandle: Timeout&amp;#xa;—&amp;#xa;+ startWorker(): Void&amp;#xa;+ expireOverdueBookings(): Integer&amp;#xa;+ stopWorker(): Void" style="swimlane;fontStyle=0;align=left;spacingLeft=8;spacingRight=8;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;collapsible=0;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#9333ea;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1180" y="810" width="270" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_417" value="&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;UserRole&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;CUSTOMER&amp;#xa;STAFF&amp;#xa;ADMIN" style="rounded=1;whiteSpace=wrap;html=1;align=center;fillColor=#f8fafc;strokeColor=#64748b;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="340" y="800" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_418" value="&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;BookingStatus&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;PENDING&amp;#xa;UNDER_REVIEW&amp;#xa;ACCEPTED&amp;#xa;REJECTED&amp;#xa;EXPIRED&amp;#xa;CANCELLED&amp;#xa;COMPLETED" style="rounded=1;whiteSpace=wrap;html=1;align=center;fillColor=#f8fafc;strokeColor=#64748b;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="480" y="800" width="130" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_419" value="&amp;lt;&amp;lt;enumeration&amp;gt;&amp;gt;&amp;#xa;&amp;lt;b&amp;gt;BookingType&amp;lt;/b&amp;gt;&amp;#xa;—&amp;#xa;MARRIAGE_PROPOSAL&amp;#xa;LOVE_PROPOSAL&amp;#xa;ADVERTISEMENT&amp;#xa;BIRTHDAY&amp;#xa;ANNIVERSARY&amp;#xa;PROMOTION&amp;#xa;EVENT" style="rounded=1;whiteSpace=wrap;html=1;align=center;fillColor=#f8fafc;strokeColor=#64748b;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="630" y="800" width="150" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="cl_420" value="1&#xa;places&#xa;*" style="endArrow=none;html=1;strokeColor=#3b82f6;fontSize=10;" edge="1" parent="1" source="cl_401" target="cl_406">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_421" value="1&#xa;contains&#xa;1..*" style="startArrow=diamond;startFill=1;endArrow=none;html=1;strokeColor=#ef4444;fontSize=10;" edge="1" parent="1" source="cl_402" target="cl_403">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_422" value="1&#xa;schedules&#xa;*" style="startArrow=diamond;startFill=1;endArrow=none;html=1;strokeColor=#ef4444;fontSize=10;" edge="1" parent="1" source="cl_403" target="cl_405">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_423" value="1&#xa;screens&#xa;*" style="endArrow=none;html=1;strokeColor=#c026d3;fontSize=10;" edge="1" parent="1" source="cl_404" target="cl_405">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_424" value="1&#xa;reserves interval&#xa;*" style="startArrow=diamond;startFill=0;endArrow=none;html=1;strokeColor=#ca8a04;fontSize=10;" edge="1" parent="1" source="cl_405" target="cl_406">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_425" value="1&#xa;attaches&#xa;0..1" style="startArrow=diamond;startFill=1;endArrow=none;html=1;strokeColor=#4338ca;fontSize=10;" edge="1" parent="1" source="cl_406" target="cl_407">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_426" value="1&#xa;generates&#xa;1" style="startArrow=diamond;startFill=1;endArrow=none;html=1;strokeColor=#16a34a;fontSize=10;" edge="1" parent="1" source="cl_406" target="cl_408">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_427" value="1&#xa;receives&#xa;*" style="endArrow=none;html=1;strokeColor=#0f766e;fontSize=10;" edge="1" parent="1" source="cl_401" target="cl_409">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_428" value="1&#xa;triggers&#xa;*" style="endArrow=none;html=1;strokeColor=#c2410c;fontSize=10;" edge="1" parent="1" source="cl_401" target="cl_410">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_429" value="&amp;lt;&amp;lt;delegates&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;strokeColor=#7c3aed;fontSize=10;" edge="1" parent="1" source="cl_412" target="cl_413">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_430" value="&amp;lt;&amp;lt;encrypts&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;strokeColor=#4338ca;fontSize=10;" edge="1" parent="1" source="cl_413" target="cl_414">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_431" value="&amp;lt;&amp;lt;notifies&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;strokeColor=#0f766e;fontSize=10;" edge="1" parent="1" source="cl_413" target="cl_415">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="cl_432" value="&amp;lt;&amp;lt;mutates&amp;gt;&amp;gt;" style="endArrow=open;dashed=1;html=1;strokeColor=#ca8a04;fontSize=10;" edge="1" parent="1" source="cl_413" target="cl_406">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

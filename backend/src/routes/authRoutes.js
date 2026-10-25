@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { register, login, getCurrentUser, guestLogin } from '../controllers/authController.js';
+import { authenticate } from '../middleware/auth.js';
+import { authRateLimiter } from '../middleware/rateLimiter.js';
+const router = Router();
+router.post('/register', authRateLimiter, register);
+router.post('/login', authRateLimiter, login);
+router.post('/guest', guestLogin);
+router.get('/me', authenticate, getCurrentUser);
+export default router;

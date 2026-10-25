@@ -1,0 +1,121 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.6 Chrome/140.0.7339.249 Electron/38.8.0 Safari/537.36" version="29.3.6">
+  <diagram name="ER" id="0">
+    <mxGraphModel dx="1025" dy="501" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="shape=rectangle;html=1;" value="USER" vertex="1">
+          <mxGeometry height="50" width="120" x="250" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="ellipse;html=1;" value="User_ID" vertex="1">
+          <mxGeometry height="30" width="90" x="250" as="geometry" />
+        </mxCell>
+        <mxCell id="4" edge="1" parent="1" source="3" target="2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="shape=rectangle;html=1;" value="ADVERTISEMENT" vertex="1">
+          <mxGeometry height="50" width="170" x="500" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="rhombus;html=1;" value="Creates" vertex="1">
+          <mxGeometry height="50" width="70" x="400" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="7" edge="1" parent="1" source="2" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8" edge="1" parent="1" source="6" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="1" style="shape=rectangle;html=1;" value="BOOKING" vertex="1">
+          <mxGeometry height="50" width="120" x="250" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="1" style="rhombus;html=1;" value="Makes" vertex="1">
+          <mxGeometry height="50" width="70" x="290" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="11" edge="1" parent="1" source="2" target="10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" edge="1" parent="1" source="10" target="9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="shape=rectangle;html=1;" value="PAYMENT" vertex="1">
+          <mxGeometry height="50" width="120" x="250" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="1" style="rhombus;html=1;" value="Has" vertex="1">
+          <mxGeometry height="50" width="60" x="285" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="15" edge="1" parent="1" source="9" target="14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" edge="1" parent="1" source="14" target="13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" parent="1" style="shape=rectangle;html=1;" value="ADVERTISEMENT_SLOT" vertex="1">
+          <mxGeometry height="50" width="180" x="500" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="18" parent="1" style="rhombus;html=1;" value="Books" vertex="1">
+          <mxGeometry height="50" width="70" x="410" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="19" edge="1" parent="1" source="9" target="18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" edge="1" parent="1" source="18" target="17">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="21" parent="1" style="shape=rectangle;html=1;" value="SHOW" vertex="1">
+          <mxGeometry height="50" width="100" x="830" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="22" parent="1" style="rhombus;html=1;" value="Scheduled" vertex="1">
+          <mxGeometry height="50" width="60" x="730" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="23" edge="1" parent="1" source="17" target="22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="24" edge="1" parent="1" source="22" target="21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="25" parent="1" style="shape=rectangle;html=1;" value="MOVIE" vertex="1">
+          <mxGeometry height="50" width="100" x="700" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="26" parent="1" style="shape=rectangle;html=1;" value="SCREEN" vertex="1">
+          <mxGeometry height="50" width="100" x="860" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="27" edge="1" parent="1" source="21" target="25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="28" edge="1" parent="1" source="21" target="26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="29" parent="1" style="shape=rectangle;html=1;" value="THEATRE" vertex="1">
+          <mxGeometry height="50" width="120" x="860" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="30" edge="1" parent="1" source="26" target="29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="31" parent="1" style="shape=rectangle;html=1;" value="MEDIA_FILE" vertex="1">
+          <mxGeometry height="50" width="150" x="500" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="32" edge="1" parent="1" source="5" target="31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="33" parent="1" style="shape=rectangle;html=1;" value="APPROVAL" vertex="1">
+          <mxGeometry height="50" width="120" x="760" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="34" parent="1" style="shape=rectangle;html=1;" value="ADMIN" vertex="1">
+          <mxGeometry height="50" width="100" x="930" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="35" edge="1" parent="1" source="5" target="33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="36" edge="1" parent="1" source="34" target="33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="37" parent="1" style="shape=rectangle;html=1;" value="AD_CATEGORY" vertex="1">
+          <mxGeometry height="50" width="150" x="500" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="38" edge="1" parent="1" source="37" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

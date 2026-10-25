@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" agent="Mozilla/5.0" version="24.0.0">
+  <diagram id="act_diag" name="Activity Diagram">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1350" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="a_300" value="CineMoments — UML 2.x Activity Diagram (Interval Booking, Media Ingestion, Auto-Expiration &amp; Concurrency Safe Approval)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#1e293b;strokeColor=#3b82f6;fontColor=#ffffff;fontStyle=1;fontSize=15;size=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="15" width="950" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="a_301" value="Customer (Guest)" style="swimlane;startSize=30;horizontal=1;fontStyle=1;fontSize=13;fillColor=#eff6ff;strokeColor=#3b82f6;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="360" height="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="a_302" value="CineMoments System (Backend API &amp; Database Engine)" style="swimlane;startSize=30;horizontal=1;fontStyle=1;fontSize=13;fillColor=#f8fafc;strokeColor=#64748b;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="400" y="70" width="480" height="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="a_303" value="Theatre Staff &amp; Automation Worker" style="swimlane;startSize=30;horizontal=1;fontStyle=1;fontSize=13;fillColor=#fef2f2;strokeColor=#ef4444;collapsible=0;" vertex="1" parent="1">
+          <mxGeometry x="880" y="70" width="420" height="1180" as="geometry" />
+        </mxCell>
+        <mxCell id="a_304" value="" style="ellipse;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="200" y="120" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="a_305" value="Browse Theatres,&#xa;Select Movie &amp; Show Time" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="180" width="190" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a_306" value="Enter Big-Screen Message&#xa;&amp; Choose Booking Purpose" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="260" width="190" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a_307" value="Upload Proposal Media&#xa;(Photo / Video File)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="120" y="340" width="190" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a_308" value="Valid Magic&#xa;Bytes?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#475569;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="335" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a_309" value="AES-256-GCM Encrypt File&#xa;(Generate IV + Auth Tag)&#xa;Save to /uploads/*.enc" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#4338ca;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="535" y="430" width="210" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="a_310" value="Wallet Balance&#xa;&gt;= Fee?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#e2e8f0;strokeColor=#475569;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="580" y="515" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a_311" value="Deduct User Wallet Balance&#xa;Credit 80% Theatre Owner&#xa;Credit 20% Super Admin" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="535" y="605" width="210" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="a_312" value="Insert Booking Request&#xa;(Status = &quot;PENDING&quot;)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="545" y="690" width="190" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a_313" value="Staff Reviews Request Queue&#xa;&amp; Decrypted Media Preview" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="980" y="690" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a_314" value="Staff&#xa;Decision?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1030" y="775" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a_315" value="Mark Status &quot;REJECTED&quot;&#xa;Refund Amount to Wallet&#xa;Dispatch Notification" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fecaca;strokeColor=#ef4444;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="865" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a_316" value="BEGIN IMMEDIATE;&#xa;(Acquire Exclusive DB Lock)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="865" width="190" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a_317" value="Slot Already&#xa;Accepted?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="935" y="945" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a_318" value="ROLLBACK Transaction&#xa;Throw 409 Conflict" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fecaca;strokeColor=#ef4444;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1100" y="950" width="160" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a_319" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1040" width="520" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="a_320" value="Update Target Booking&#xa;to &quot;ACCEPTED&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="430" y="1070" width="170" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="a_321" value="Update Competing&#xa;Requests to &quot;EXPIRED&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef08a;strokeColor=#ca8a04;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="620" y="1070" width="160" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="a_322" value="Refund Full Amount to&#xa;Competing Users&apos; Wallets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="1070" width="170" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="a_323" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="480" y="1140" width="520" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="a_324" value="COMMIT Transaction&#xa;Dispatch Notifications&#xa;Log Immutable Audit Trail" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="1170" width="200" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="a_325" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#16a34a;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="725" y="1245" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="a_326" value="" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ef4444;strokeWidth=3;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="955" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="a_327" value="" style="endArrow=block;html=1;strokeColor=#2563eb;" edge="1" parent="1" source="a_304" target="a_305">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_328" value="" style="endArrow=block;html=1;strokeColor=#2563eb;" edge="1" parent="1" source="a_305" target="a_306">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_329" value="" style="endArrow=block;html=1;strokeColor=#2563eb;" edge="1" parent="1" source="a_306" target="a_307">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_330" value="Multipart stream" style="endArrow=block;html=1;strokeColor=#2563eb;" edge="1" parent="1" source="a_307" target="a_308">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_331" value="No [Corrupt / Executable]" style="endArrow=block;html=1;strokeColor=#ef4444;fontColor=#ef4444;fontSize=10;" edge="1" parent="1" source="a_308" target="a_307">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="640" y="310" />
+            <mxPoint x="215" y="310" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_332" value="Yes [Valid Magic Bytes]" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1" source="a_308" target="a_309">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_333" value="" style="endArrow=block;html=1;strokeColor=#4338ca;" edge="1" parent="1" source="a_309" target="a_310">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_334" value="No [Insufficient]" style="endArrow=block;html=1;strokeColor=#ef4444;fontColor=#ef4444;fontSize=10;" edge="1" parent="1" source="a_310" target="a_306">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="480" y="545" />
+            <mxPoint x="480" y="285" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_335" value="Yes [Sufficient]" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1" source="a_310" target="a_311">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_336" value="" style="endArrow=block;html=1;strokeColor=#16a34a;" edge="1" parent="1" source="a_311" target="a_312">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_337" value="Queued for Review" style="endArrow=block;html=1;strokeColor=#64748b;" edge="1" parent="1" source="a_312" target="a_313">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_338" value="" style="endArrow=block;html=1;strokeColor=#dc2626;" edge="1" parent="1" source="a_313" target="a_314">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_339" value="[Reject]" style="endArrow=block;html=1;strokeColor=#ef4444;fontColor=#ef4444;fontSize=10;" edge="1" parent="1" source="a_314" target="a_315">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_340" value="" style="endArrow=block;html=1;strokeColor=#ef4444;" edge="1" parent="1" source="a_315" target="a_326">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_341" value="[Accept]" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1" source="a_314" target="a_316">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_342" value="" style="endArrow=block;html=1;strokeColor=#dc2626;" edge="1" parent="1" source="a_316" target="a_317">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_343" value="Yes [Collision]" style="endArrow=block;html=1;strokeColor=#ef4444;fontColor=#ef4444;fontSize=10;" edge="1" parent="1" source="a_317" target="a_318">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_344" value="" style="endArrow=block;html=1;strokeColor=#ef4444;" edge="1" parent="1" source="a_318" target="a_326">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_345" value="No [Slot Free]" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1" source="a_317" target="a_319">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="995" y="1025" />
+            <mxPoint x="740" y="1025" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_346" value="" style="endArrow=block;html=1;strokeColor=#16a34a;" edge="1" parent="1" source="a_319" target="a_320">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="515" y="1055" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_347" value="" style="endArrow=block;html=1;strokeColor=#ca8a04;" edge="1" parent="1" source="a_319" target="a_321">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="700" y="1055" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_348" value="" style="endArrow=block;html=1;strokeColor=#16a34a;" edge="1" parent="1" source="a_319" target="a_322">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="885" y="1055" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_349" value="" style="endArrow=block;html=1;strokeColor=#16a34a;" edge="1" parent="1" source="a_320" target="a_323">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="515" y="1125" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_350" value="" style="endArrow=block;html=1;strokeColor=#ca8a04;" edge="1" parent="1" source="a_321" target="a_323">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="700" y="1125" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_351" value="" style="endArrow=block;html=1;strokeColor=#16a34a;" edge="1" parent="1" source="a_322" target="a_323">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="885" y="1125" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_352" value="" style="endArrow=block;html=1;strokeColor=#16a34a;" edge="1" parent="1" source="a_323" target="a_324">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a_353" value="" style="endArrow=block;html=1;strokeColor=#16a34a;" edge="1" parent="1" source="a_324" target="a_325">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

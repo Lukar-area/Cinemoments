@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" agent="Mozilla/5.0" version="24.0.0">
+  <diagram id="comm_diag" name="Communication Diagram">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1450" pageHeight="850" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_100" value="CineMoments — UML 2.x Communication Diagram (Interval Booking &amp; Atomic Resolution)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#1e293b;strokeColor=#3b82f6;fontColor=#ffffff;fontStyle=1;fontSize=15;size=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="750" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="c_101" value="Legend:&#xa;• Numbering: [Step: MethodCall(args)]&#xa;• Blue = Customer Order Flow (1 - 16)&#xa;• Crimson = Staff Review &amp; Atomic Resolution (17 - 28)&#xa;• Green = Automated Expiration (E1 - E2)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0f172a;strokeColor=#475569;fontColor=#94a3b8;fontSize=11;align=left;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="820" y="15" width="480" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_102" value="Customer&#xa;(Actor)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#3b82f6;strokeColor=#1d4ed8;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="200" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="c_103" value="Theatre Staff&#xa;(Actor)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#ef4444;strokeColor=#b91c1c;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="640" width="60" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="c_104" value=":BookingWizardUI&#xa;(React 18 Frontend)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="220" y="215" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c_105" value=":StaffDashboardUI&#xa;(React 18 Frontend)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="220" y="655" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c_106" value=":AuthMiddleware&#xa;(JWT &amp; Role Guard)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f5f9;strokeColor=#64748b;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="160" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_107" value=":BookingController&#xa;(Express Route Handler)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="470" y="215" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c_108" value=":BookingService&#xa;(Core Business Logic)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fef08a;strokeColor=#ca8a04;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="730" y="215" width="170" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c_109" value=":CryptoService&#xa;(AES-256-GCM / MagicBytes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#4338ca;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="990" y="90" width="180" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_110" value=":EncryptedStorage&#xa;(Private /uploads/*.enc)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#fed7aa;strokeColor=#ea580c;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="85" width="140" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="c_111" value=":DatabaseSync&#xa;(SQLite WAL + Unique Index)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="730" y="440" width="180" height="75" as="geometry" />
+        </mxCell>
+        <mxCell id="c_112" value=":NotificationService&#xa;(In-App Alerts)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ccfbf1;strokeColor=#0f766e;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="990" y="310" width="170" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_113" value=":AuditService&#xa;(Security Audit Logs)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffedd5;strokeColor=#c2410c;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="990" y="450" width="170" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_114" value=":ExpirationWorker&#xa;(60s Cron Worker)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e8ff;strokeColor=#9333ea;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="470" y="450" width="170" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="c_115" value="1: selectShowAndInterval()&#xa;2: submitBooking(data, media) ➔&#xa;&#xa; 16: confirmationCard ↵" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#2563eb;fontColor=#1d4ed8;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_102" target="c_104">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_116" value="3: POST /api/bookings ➔&#xa;&#xa; 15: 201 Created(bookingId) ↵" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#2563eb;fontColor=#1d4ed8;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_104" target="c_107">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_117" value="3.1: verifyToken() ➔&#xa; 3.2: userPayload ↵" style="endArrow=none;html=1;strokeWidth=1;dashed=1;strokeColor=#64748b;fontColor=#475569;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_107" target="c_106">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_118" value="4: createBooking(inputPayload) ➔&#xa; 14: return { bookingId } ↵&#xa;&#xa; 20: acceptBooking(bookingId) ➔&#xa; 28: return { status: ACCEPTED } ↵" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#475569;fontColor=#334155;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_107" target="c_108">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_119" value="5: validateMediaBuffer() ➔&#xa;6: encryptBuffer(AES-256) ➔&#xa; 7: { iv, authTag, encBuf } ↵" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#4338ca;fontColor=#3730a3;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_108" target="c_109">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_120" value="8: writeFileSync(uuid.enc) ➔" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#ea580c;fontColor=#c2410c;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_109" target="c_110">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_121" value="9: verifyShowAndSlot() ➔&#xa;10: checkWalletBalance() ➔&#xa;11: deductWalletAndSplitRevenue() ➔&#xa;12: insertBooking(PENDING) ➔&#xa;13: insertBookingMedia() ➔&#xa;&#xa;21: BEGIN IMMEDIATE (Exclusive Lock) ➔&#xa;22: checkDoubleBooking(showId) ➔&#xa;23: UPDATE status = ACCEPTED ➔&#xa;24: UPDATE competing = EXPIRED ➔&#xa;25: refundCompetingWallets() ➔&#xa;27: COMMIT ➔" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_108" target="c_111">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_122" value="26a: notifyAccepted(userId) ➔&#xa;26b: notifyExpired(competingIds) ➔" style="endArrow=none;html=1;strokeWidth=1.5;strokeColor=#0f766e;fontColor=#0f766e;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_108" target="c_112">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_123" value="13a: recordAuditLog(CREATE) ➔&#xa;26c: recordAuditLog(ACCEPT) ➔" style="endArrow=none;html=1;strokeWidth=1.5;strokeColor=#c2410c;fontColor=#9a3412;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_108" target="c_113">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_124" value="17: reviewRequests() ➔&#xa;18: clickAccept(bookingId) ➔&#xa;&#xa; 29: displaySuccess() ↵" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_103" target="c_105">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_125" value="19: POST /api/bookings/:id/accept ➔&#xa;&#xa; 28a: 200 OK(Accepted) ↵" style="endArrow=none;html=1;strokeWidth=2;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_105" target="c_107">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+            <mxPoint x="400" y="550" />
+          </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="c_126" value="E1: queryPendingOverdueShows() ➔&#xa;E2: expireAndRefundOverdue() ➔" style="endArrow=none;html=1;strokeWidth=1.5;strokeColor=#9333ea;fontColor=#7e22ce;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="c_114" target="c_111">
+          <mxGeometry relative="1" as="geometry">
+            
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

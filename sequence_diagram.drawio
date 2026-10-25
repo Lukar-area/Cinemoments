@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="Electron" agent="Mozilla/5.0" version="24.0.0">
+  <diagram id="seq_diag" name="Sequence Diagram">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1350" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="s_200" value="CineMoments — UML Sequence Diagram (Interval Booking, Media Encryption &amp; Atomic Acceptance)" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#1e293b;strokeColor=#3b82f6;fontColor=#ffffff;fontStyle=1;fontSize=15;size=15;" vertex="1" parent="1">
+          <mxGeometry x="40" y="15" width="820" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_201" value="c:Customer&#xa;(Actor)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#3b82f6;strokeColor=#1d4ed8;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="80" width="40" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="s_202" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="155" as="sourcePoint" />
+            <mxPoint x="100" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_203" value="ui:BookingWizard&#xa;(Frontend)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dbeafe;strokeColor=#2563eb;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="190" y="80" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_204" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="155" as="sourcePoint" />
+            <mxPoint x="230" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_205" value="ctrl:BookingCtrl&#xa;(Express API)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ede9fe;strokeColor=#7c3aed;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="340" y="80" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_206" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="155" as="sourcePoint" />
+            <mxPoint x="380" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_207" value="srv:BookingService&#xa;(Business Logic)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fef08a;strokeColor=#ca8a04;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="490" y="80" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_208" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="155" as="sourcePoint" />
+            <mxPoint x="530" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_209" value="crypto:CryptoService&#xa;(AES-256-GCM)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e0e7ff;strokeColor=#4338ca;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="650" y="80" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_210" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="690" y="155" as="sourcePoint" />
+            <mxPoint x="690" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_211" value="db:DatabaseSync&#xa;(SQLite Engine)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dcfce7;strokeColor=#16a34a;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="800" y="80" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_212" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="155" as="sourcePoint" />
+            <mxPoint x="840" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_213" value="staff:TheatreStaff&#xa;(Actor)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#ef4444;strokeColor=#b91c1c;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="960" y="80" width="40" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="s_214" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1000" y="155" as="sourcePoint" />
+            <mxPoint x="1000" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_215" value="dash:StaffDashboard&#xa;(Frontend)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fee2e2;strokeColor=#dc2626;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="80" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_216" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1130" y="155" as="sourcePoint" />
+            <mxPoint x="1130" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_217" value="notif:NotifService&#xa;(In-App)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ccfbf1;strokeColor=#0f766e;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1230" y="80" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s_218" value="" style="endArrow=none;dashed=1;html=1;strokeWidth=1;strokeColor=#94a3b8;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1270" y="155" as="sourcePoint" />
+            <mxPoint x="1270" y="1250" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_219" value="PHASE 1: INTERVAL BOOKING SUBMISSION &amp; AES-256-GCM ENCRYPTED STORAGE" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2563eb;strokeColor=#1d4ed8;fontColor=#ffffff;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="50" y="165" width="860" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s_220" value="1. submitBooking(showId, msg, mediaFile)" style="endArrow=block;html=1;strokeColor=#2563eb;fontColor=#1d4ed8;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="210" as="sourcePoint" />
+            <mxPoint x="230" y="210" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_221" value="2. POST /api/bookings (multipart/form-data)" style="endArrow=block;html=1;strokeColor=#2563eb;fontColor=#1d4ed8;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="240" as="sourcePoint" />
+            <mxPoint x="380" y="240" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_222" value="3. createBooking(inputPayload)" style="endArrow=block;html=1;strokeColor=#7c3aed;fontColor=#6d28d9;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="270" as="sourcePoint" />
+            <mxPoint x="530" y="270" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_223" value="4. SELECT s.*, price, owner_id WHERE id = showId" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="300" as="sourcePoint" />
+            <mxPoint x="840" y="300" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_224" value="show details (Price = ₹500)" style="endArrow=open;dashed=1;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="325" as="sourcePoint" />
+            <mxPoint x="530" y="325" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_225" value="5. SELECT wallet_balance FROM users WHERE id = userId" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="350" as="sourcePoint" />
+            <mxPoint x="840" y="350" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_226" value="wallet_balance = ₹2000.00" style="endArrow=open;dashed=1;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="375" as="sourcePoint" />
+            <mxPoint x="530" y="375" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_227" value="6. validateMediaBuffer(buffer, originalname)" style="endArrow=block;html=1;strokeColor=#4338ca;fontColor=#3730a3;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="405" as="sourcePoint" />
+            <mxPoint x="690" y="405" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_228" value="validated (magic bytes OK: image/jpeg)" style="endArrow=open;dashed=1;html=1;strokeColor=#4338ca;fontColor=#3730a3;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="690" y="430" as="sourcePoint" />
+            <mxPoint x="530" y="430" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_229" value="7. encryptBuffer(buffer) [12-byte IV + Auth Tag]" style="endArrow=block;html=1;strokeColor=#4338ca;fontColor=#3730a3;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="455" as="sourcePoint" />
+            <mxPoint x="690" y="455" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_230" value="{ ivHex, authTagHex, encryptedBuffer }" style="endArrow=open;dashed=1;html=1;strokeColor=#4338ca;fontColor=#3730a3;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="690" y="480" as="sourcePoint" />
+            <mxPoint x="530" y="480" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_231" value="8. UPDATE wallet (User -₹500, Theatre +₹400 [80%], Admin +₹100 [20%])" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="510" as="sourcePoint" />
+            <mxPoint x="840" y="510" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_232" value="9. INSERT INTO interval_bookings (status=&quot;PENDING&quot;) &amp; media" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="540" as="sourcePoint" />
+            <mxPoint x="840" y="540" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_233" value="bookingId = 101" style="endArrow=open;dashed=1;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="565" as="sourcePoint" />
+            <mxPoint x="530" y="565" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_234" value="10. return { bookingId: 101 }" style="endArrow=open;dashed=1;html=1;strokeColor=#7c3aed;fontColor=#6d28d9;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="590" as="sourcePoint" />
+            <mxPoint x="380" y="590" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_235" value="11. 201 Created (Booking Pending Moderation)" style="endArrow=open;dashed=1;html=1;strokeColor=#2563eb;fontColor=#1d4ed8;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="615" as="sourcePoint" />
+            <mxPoint x="230" y="615" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_236" value="12. Show Confirmation &amp; Live Screen Mockup" style="endArrow=open;dashed=1;html=1;strokeColor=#2563eb;fontColor=#1d4ed8;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="640" as="sourcePoint" />
+            <mxPoint x="100" y="640" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_237" value="PHASE 2: STAFF MODERATION, ATOMIC CONCURRENCY LOCK &amp; COMPETING EXSPIRATION" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dc2626;strokeColor=#b91c1c;fontColor=#ffffff;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="50" y="680" width="1260" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="s_238" value="13. viewPendingBookings()" style="endArrow=block;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1000" y="720" as="sourcePoint" />
+            <mxPoint x="1130" y="720" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_239" value="14. GET /api/bookings/theatre/:id" style="endArrow=block;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1130" y="745" as="sourcePoint" />
+            <mxPoint x="380" y="745" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_240" value="pending requests list [Req #101, Req #102]" style="endArrow=open;dashed=1;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="770" as="sourcePoint" />
+            <mxPoint x="1130" y="770" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_241" value="15. click &quot;Accept Booking&quot;(id=101)" style="endArrow=block;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1000" y="800" as="sourcePoint" />
+            <mxPoint x="1130" y="800" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_242" value="16. POST /api/bookings/101/accept" style="endArrow=block;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1130" y="825" as="sourcePoint" />
+            <mxPoint x="380" y="825" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_243" value="17. acceptBooking(101, staffUserId)" style="endArrow=block;html=1;strokeColor=#7c3aed;fontColor=#6d28d9;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="850" as="sourcePoint" />
+            <mxPoint x="530" y="850" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_244" value="18. runTransaction() ➔ BEGIN IMMEDIATE; (Acquires Exclusive Lock)" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#b91c1c;fontColor=#b91c1c;fontStyle=1;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="880" as="sourcePoint" />
+            <mxPoint x="840" y="880" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_245" value="19. SELECT id FROM interval_bookings WHERE show_id=show_id AND status=&quot;ACCEPTED&quot;" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="910" as="sourcePoint" />
+            <mxPoint x="840" y="910" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_246" value="No existing accepted row (Clear to proceed)" style="endArrow=open;dashed=1;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="840" y="935" as="sourcePoint" />
+            <mxPoint x="530" y="935" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_247" value="alt [Concurrency Conflict Check]" style="shape=umlFrame;whiteSpace=wrap;html=1;width=160;height=20;fillColor=none;strokeColor=#64748b;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="450" y="960" width="860" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="s_248" value="20. UPDATE interval_bookings SET status=&quot;ACCEPTED&quot;, accepted_at=NOW WHERE id=101" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="990" as="sourcePoint" />
+            <mxPoint x="840" y="990" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_249" value="21. UPDATE interval_bookings SET status=&quot;EXPIRED&quot; WHERE show_id=show_id AND id!=101" style="endArrow=block;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="1020" as="sourcePoint" />
+            <mxPoint x="840" y="1020" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_250" value="22. refundBookingTransaction(competingRequests) [Re-credit user wallet]" style="endArrow=block;html=1;strokeColor=#16a34a;fontColor=#15803d;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="1050" as="sourcePoint" />
+            <mxPoint x="840" y="1050" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_251" value="23. COMMIT; (Release DB Lock)" style="endArrow=block;html=1;strokeWidth=2;strokeColor=#16a34a;fontColor=#15803d;fontStyle=1;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="1080" as="sourcePoint" />
+            <mxPoint x="840" y="1080" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_252" value="24. createNotification(acceptedUserId, &quot;Booking Accepted! 🎉&quot;)" style="endArrow=block;html=1;strokeColor=#0f766e;fontColor=#0f766e;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="1110" as="sourcePoint" />
+            <mxPoint x="1270" y="1110" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_253" value="25. createNotification(competingUserId, &quot;Expired &amp; Refunded&quot;)" style="endArrow=block;html=1;strokeColor=#0f766e;fontColor=#0f766e;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="1135" as="sourcePoint" />
+            <mxPoint x="1270" y="1135" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_254" value="26. return { success: true, status: &quot;ACCEPTED&quot;, expiredCount: 1 }" style="endArrow=open;dashed=1;html=1;strokeColor=#7c3aed;fontColor=#6d28d9;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="530" y="1165" as="sourcePoint" />
+            <mxPoint x="380" y="1165" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_255" value="27. 200 OK (Accepted)" style="endArrow=open;dashed=1;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="1190" as="sourcePoint" />
+            <mxPoint x="1130" y="1190" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="s_256" value="28. Display Acceptance Banner" style="endArrow=open;dashed=1;html=1;strokeColor=#dc2626;fontColor=#b91c1c;fontSize=10;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1130" y="1215" as="sourcePoint" />
+            <mxPoint x="1000" y="1215" as="targetPoint" />
+            
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
