@@ -9,11 +9,12 @@ export async function connectDB() {
   try {
     await mongoose.connect(config.mongodbUri, {
       dbName: 'cinemoments',
+      serverSelectionTimeoutMS: 10000,
     });
     console.log('✅ MongoDB Atlas connected successfully.');
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
-    process.exit(1);
+    console.warn('⚠️ Server will continue running to allow health checks. Check Atlas Network Access whitelist.');
   }
 
   mongoose.connection.on('error', (err) => {
