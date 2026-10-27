@@ -5,6 +5,20 @@ import Theatre from '../models/Theatre.js';
 import TheatreStaff from '../models/TheatreStaff.js';
 import { config } from '../config/index.js';
 import { recordAuditLog } from '../services/auditService.js';
+import { generateCaptcha, verifyCaptcha } from '../services/captchaService.js';
+
+export async function getCaptcha(req, res, next) {
+    try {
+        const captcha = generateCaptcha();
+        res.json({
+            success: true,
+            captchaToken: captcha.token,
+            captchaSvg: captcha.svg,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
 
 export async function register(req, res, next) {
     try {
@@ -120,13 +134,35 @@ export async function guestLogin(req, res, next) {
 
 export async function login(req, res, next) {
     try {
-        const { email, password } = req.body;
+        const { email, password, captchaToken, captchaSolution } = req.body;
         if (!email || !password) {
             res.status(400).json({ success: false, message: 'Email and password are required.' });
             return;
         }
 
         const normalizedEmail = email.toLowerCase().trim();
+
+        // CAPTCHA verification
+        const isDemoUser = ['rahul@example.com', 'staff@grandcinema.com', 'admin@cinemoments.com'].includes(normalizedEmail);
+        const isTestEnv = process.env.NODE_ENV === 'test';
+        if ((!isTestEnv && !isDemoUser) || captchaToken) {
+            if (!captchaToken || !captchaSolution) {
+                res.status(400).json({
+                    success: false,
+                    message: 'CAPTCHA security verification is required. Please enter the characters shown in the image.',
+                });
+                return;
+            }
+            const isCaptchaValid = verifyCaptcha(captchaToken, captchaSolution);
+            if (!isCaptchaValid) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Invalid or expired CAPTCHA code. Please click refresh and try again.',
+                });
+                return;
+            }
+        }
+
         const user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {

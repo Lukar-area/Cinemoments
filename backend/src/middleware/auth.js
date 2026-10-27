@@ -7,15 +7,21 @@ import User from '../models/User.js';
  * Extracts from Authorization: Bearer <token>
  */
 export async function authenticate(req, res, next) {
+    let token = null;
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+    } else if (req.query?.token) {
+        token = req.query.token;
+    }
+
+    if (!token) {
         res.status(401).json({
             success: false,
             message: 'Authentication required. Please log in to proceed.',
         });
         return;
     }
-    const token = authHeader.split(' ')[1];
     try {
         const decoded = jwt.verify(token, config.jwtSecret);
         const user = await User.findById(decoded.id);

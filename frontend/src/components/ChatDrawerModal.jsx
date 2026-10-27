@@ -1,7 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.js';
-import { X, Send, MessageSquare, Building2, User as UserIcon, RefreshCw } from 'lucide-react';
+import {
+  X,
+  Send,
+  MessageSquare,
+  Building2,
+  User as UserIcon,
+  RefreshCw,
+  Lock,
+  Paperclip,
+  Trash2,
+  FileVideo,
+} from 'lucide-react';
 
 export const ChatDrawerModal = ({
   isOpen,
@@ -15,12 +26,29 @@ export const ChatDrawerModal = ({
   const { user } = useAuth();
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [selectedMedia, setSelectedMedia] = useState(null);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 25 * 1024 * 1024) {
+      alert('Selected file exceeds the 25 MB size limit.');
+      return;
+    }
+    setSelectedMedia(file);
+  };
+
+  const clearSelectedMedia = () => {
+    setSelectedMedia(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const loadMessages = async (silent = false) => {
@@ -53,17 +81,32 @@ export const ChatDrawerModal = ({
 
   const handleSend = async (e) => {
     e?.preventDefault();
-    if (!newMessage.trim() || sending) return;
+    const hasText = Boolean(newMessage.trim());
+    if ((!hasText && !selectedMedia) || sending) return;
 
     try {
       setSending(true);
-      const res = await api.chat.sendMessage({
-        theatreId,
-        userId,
-        bookingId: bookingId || undefined,
-        message: newMessage.trim(),
-      });
+      let res;
+      if (selectedMedia) {
+        const formData = new FormData();
+        formData.append('theatreId', theatreId);
+        if (userId) formData.append('userId', userId);
+        if (bookingId) formData.append('bookingId', bookingId);
+        if (hasText) formData.append('message', newMessage.trim());
+        formData.append('media', selectedMedia);
+        res = await api.chat.sendMessage(formData);
+      } else {
+        res = await api.chat.sendMessage({
+          theatreId,
+          userId,
+          bookingId: bookingId || undefined,
+          message: newMessage.trim(),
+        });
+      }
+
       setNewMessage('');
+      clearSelectedMedia();
+
       if (res.chatMessage) {
         setMessages((prev) => [...prev, res.chatMessage]);
       } else {
@@ -164,7 +207,35 @@ export const ChatDrawerModal = ({
                         : 'bg-cinema-800 text-slate-200 border border-cinema-700/80 rounded-bl-none'
                     }`}
                   >
-                    {msg.message}
+                    {msg.has_media && (
+                      <div className="mb-2">
+                        <div className="mb-1.5">
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/40 text-[10px] font-mono text-amber-300 border border-amber-500/25">
+                            <Lock className="w-2.5 h-2.5 text-amber-400" />
+                            AES-256-GCM {msg.media_type === 'VIDEO' ? 'Encrypted Video' : 'Encrypted Media'}
+                          </span>
+                        </div>
+                        {msg.media_type === 'VIDEO' ? (
+                          <div className="rounded-xl overflow-hidden bg-black border border-amber-500/20 shadow-md">
+                            <video
+                              controls
+                              preload="metadata"
+                              src={api.chat.getMediaUrl(msg.id)}
+                              className="w-full max-h-56 object-contain bg-black"
+                            />
+                          </div>
+                        ) : (
+                          <div className="rounded-xl overflow-hidden border border-amber-500/20 shadow-md">
+                            <img
+                              src={api.chat.getMediaUrl(msg.id)}
+                              alt={msg.original_filename || 'Encrypted Media'}
+                              className="w-full max-h-56 object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    {msg.message && <div className="leading-relaxed">{msg.message}</div>}
                   </div>
                 </div>
               );
@@ -173,21 +244,62 @@ export const ChatDrawerModal = ({
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Selected Media Preview Chip */}
+        {selectedMedia && (
+          <div className="px-4 py-2 border-t border-cinema-700/80 bg-cinema-900/90 flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-amber-300 truncate">
+              <FileVideo className="w-4 h-4 shrink-0 text-amber-400" />
+              <span className="truncate font-medium">{selectedMedia.name}</span>
+              <span className="text-[10px] text-slate-400 font-mono">
+                ({(selectedMedia.size / (1024 * 1024)).toFixed(2)} MB)
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold border border-emerald-500/30 flex items-center gap-1">
+                <Lock className="w-2.5 h-2.5" /> Encrypted Video
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={clearSelectedMedia}
+              className="p-1 rounded text-slate-400 hover:text-red-400 transition-colors"
+              title="Remove attachment"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
         {/* Input Bar */}
         <form
           onSubmit={handleSend}
           className="p-3 sm:p-4 border-t border-cinema-700/80 bg-cinema-850 flex items-center gap-2"
         >
           <input
+            type="file"
+            ref={fileInputRef}
+            accept=".mp4,.webm,.jpg,.jpeg,.png"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className={`p-2.5 rounded-xl border border-cinema-700 bg-cinema-900 hover:bg-cinema-800 text-amber-400 hover:text-amber-300 transition-colors ${
+              selectedMedia ? 'border-amber-400 bg-amber-500/10' : ''
+            }`}
+            title="Attach encrypted video or photo (MP4, WebM, JPG, PNG)"
+          >
+            <Paperclip className="w-4 h-4" />
+          </button>
+          <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
+            placeholder={selectedMedia ? 'Add a caption for this encrypted video...' : 'Type your message...'}
             className="flex-1 bg-cinema-900 border border-cinema-700 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
           />
           <button
             type="submit"
-            disabled={!newMessage.trim() || sending}
+            disabled={(!newMessage.trim() && !selectedMedia) || sending}
             className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cinema-gold to-amber-400 hover:from-amber-400 hover:to-cinema-gold text-cinema-950 font-bold text-xs shadow-md shadow-cinema-gold/20 disabled:opacity-40 transition-all flex items-center gap-1.5"
           >
             <Send className="w-3.5 h-3.5" />

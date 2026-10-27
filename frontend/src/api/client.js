@@ -34,6 +34,7 @@ export const api = {
             method: 'POST',
             body: JSON.stringify(payload),
         }),
+        getCaptcha: () => request('/auth/captcha'),
         me: () => request('/auth/me'),
     },
     theatres: {
@@ -99,7 +100,10 @@ export const api = {
         }),
     },
     media: {
-        getStreamUrl: (mediaId) => `${API_BASE}/media/${mediaId}/stream`,
+        getStreamUrl: (mediaId) => {
+            const token = localStorage.getItem('token');
+            return `${API_BASE}/media/${mediaId}/stream${token ? `?token=${token}` : ''}`;
+        },
     },
     notifications: {
         getAll: () => request('/notifications'),
@@ -137,11 +141,17 @@ export const api = {
             if (userId) search.set('userId', userId.toString());
             return request(`/chat/messages?${search.toString()}`);
         },
-        sendMessage: (data) =>
-            request('/chat/messages', {
+        sendMessage: (data) => {
+            const isFormData = data instanceof FormData;
+            return request('/chat/messages', {
                 method: 'POST',
-                body: JSON.stringify(data),
-            }),
+                body: isFormData ? data : JSON.stringify(data),
+            });
+        },
+        getMediaUrl: (messageId) => {
+            const token = localStorage.getItem('token');
+            return `${API_BASE}/chat/messages/${messageId}/media${token ? `?token=${token}` : ''}`;
+        },
     },
     payments: {
         createOrder: (data) => request('/payments/create-order', {

@@ -1,27 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.js';
-import { Film, Lock, Mail, AlertCircle, UserCheck } from 'lucide-react';
+import { Film, Lock, Mail, AlertCircle, UserCheck, ShieldCheck, RotateCw } from 'lucide-react';
 export const LoginPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [captchaSvg, setCaptchaSvg] = useState('');
+    const [captchaToken, setCaptchaToken] = useState('');
+    const [captchaSolution, setCaptchaSolution] = useState('');
+    const [loadingCaptcha, setLoadingCaptcha] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const from = location.state?.from?.pathname || '/dashboard';
+
+    const fetchCaptcha = async () => {
+        try {
+            setLoadingCaptcha(true);
+            const res = await api.auth.getCaptcha();
+            if (res.success) {
+                setCaptchaSvg(res.captchaSvg);
+                setCaptchaToken(res.captchaToken);
+                setCaptchaSolution('');
+            }
+        } catch (err) {
+            console.error('Failed to load CAPTCHA:', err);
+        } finally {
+            setLoadingCaptcha(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchCaptcha();
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email || !password) {
             setError('Please provide both email and password.');
             return;
         }
+        if (!captchaSolution.trim()) {
+            setError('Please solve the 5-character security CAPTCHA.');
+            return;
+        }
         try {
             setLoading(true);
             setError(null);
-            const res = await api.auth.login({ email, password });
+            const res = await api.auth.login({
+                email,
+                password,
+                captchaToken,
+                captchaSolution: captchaSolution.trim().toUpperCase(),
+            });
             login(res.token, res.user);
             if (res.user.role === 'STAFF') {
                 navigate('/staff');
@@ -35,6 +69,7 @@ export const LoginPage = () => {
         }
         catch (err) {
             setError(err.message || 'Login failed. Please check your credentials.');
+            fetchCaptcha();
         }
         finally {
             setLoading(false);
@@ -113,6 +148,53 @@ export const LoginPage = () => {
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"/>
                 <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-cinema-900 border border-cinema-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"/>
               </div>
+            </div>
+
+            {/* Visual CAPTCHA Verification */}
+            <div className="p-3.5 rounded-2xl bg-cinema-900/90 border border-cinema-700 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-400"/>
+                  Security CAPTCHA Verification
+                </label>
+                <button
+                  type="button"
+                  onClick={fetchCaptcha}
+                  disabled={loadingCaptcha}
+                  className="text-[11px] text-amber-400 hover:text-amber-300 flex items-center gap-1 transition-colors px-2 py-0.5 rounded bg-cinema-800 border border-cinema-700/60"
+                  title="Generate new challenge"
+                >
+                  <RotateCw className={`w-3 h-3 ${loadingCaptcha ? 'animate-spin' : ''}`}/>
+                  <span>Refresh</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2.5 items-center">
+                <div className="h-12 bg-cinema-950 border border-cinema-800 rounded-xl overflow-hidden flex items-center justify-center p-1 select-none shadow-inner">
+                  {captchaSvg ? (
+                    <img
+                      src={captchaSvg}
+                      alt="CAPTCHA Challenge"
+                      className="h-full w-full object-contain pointer-events-none"
+                    />
+                  ) : (
+                    <span className="text-[10px] text-slate-500">Generating code...</span>
+                  )}
+                </div>
+
+                <input
+                  type="text"
+                  required
+                  maxLength={5}
+                  value={captchaSolution}
+                  onChange={(e) => setCaptchaSolution(e.target.value.toUpperCase())}
+                  placeholder="ENTER CODE"
+                  className="h-12 px-3 rounded-xl bg-cinema-950 border border-cinema-700 text-sm font-mono font-bold tracking-widest text-center text-amber-300 uppercase placeholder-slate-600 focus:outline-none focus:border-amber-400 shadow-inner"
+                />
+              </div>
+              <p className="text-[10px] text-slate-500">
+                Enter the 5 characters displayed in the anti-bot visual challenge.
+              </p>
             </div>
 
             <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-cinema-gold to-amber-400 hover:from-amber-400 hover:to-cinema-gold text-cinema-950 font-bold text-sm shadow-md shadow-cinema-gold/20 transition-all duration-150 disabled:opacity-50">

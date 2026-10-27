@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 import ChatMessage from '../models/ChatMessage.js';
 import Theatre from '../models/Theatre.js';
 import User from '../models/User.js';
@@ -6,6 +9,8 @@ import IntervalBooking from '../models/IntervalBooking.js';
 import Show from '../models/Show.js';
 import Screen from '../models/Screen.js';
 import { createNotification } from '../services/notificationService.js';
+import { config } from '../config/index.js';
+import { validateMediaBuffer, encryptBuffer, decryptBuffer } from '../services/cryptoService.js';
 
 export async function getConversations(req, res, next) {
     try {
@@ -198,7 +203,12 @@ export async function getMessages(req, res, next) {
             sender_name: m.sender_id?.name || 'User',
             theatre_name: m.theatre_id?.name || 'Theatre',
             sender_role: m.sender_role,
-            message: m.message,
+            message: m.message || '',
+            has_media: Boolean(m.has_media),
+            media_type: m.media_type || null,
+            original_filename: m.original_filename || null,
+            mime_type: m.mime_type || null,
+            file_size: m.file_size || 0,
             booking_id: m.booking_id ? m.booking_id.toString() : null,
             is_read: m.is_read,
             created_at: m.created_at,
@@ -214,10 +224,16 @@ export async function getMessages(req, res, next) {
 export async function sendMessage(req, res, next) {
     try {
         const currentUser = req.user;
-        const { theatreId, userId, message, bookingId } = req.body;
+        const { theatreId, userId, message = '', bookingId } = req.body;
+        const rawMessage = (message || '').trim();
 
-        if (!theatreId || !message || !message.trim()) {
-            res.status(400).json({ success: false, message: 'theatreId and non-empty message are required.' });
+        if (!theatreId) {
+            res.status(400).json({ success: false, message: 'theatreId is required.' });
+            return;
+        }
+
+        if (!rawMessage && !req.file) {
+            res.status(400).json({ success: false, message: 'Either a text message or a media attachment is required.' });
             return;
         }
 
@@ -232,17 +248,57 @@ export async function sendMessage(req, res, next) {
             }
         }
 
+        let mediaData = {
+            has_media: false,
+            media_type: null,
+            encrypted_file_path: null,
+            original_filename: null,
+            mime_type: null,
+            file_size: 0,
+            iv: null,
+            auth_tag: null,
+        };
+
+        if (req.file) {
+            // Validate magic bytes (JPEG, PNG, MP4, WebM)
+            const validated = validateMediaBuffer(req.file.buffer, req.file.originalname);
+            // Encrypt binary buffer using AES-256-GCM
+            const encrypted = encryptBuffer(req.file.buffer);
+
+            const encryptedFilename = `chat_${Date.now()}_${crypto.randomBytes(8).toString('hex')}.enc`;
+            const storagePath = path.join(config.uploadDir, encryptedFilename);
+
+            if (!fs.existsSync(config.uploadDir)) {
+                fs.mkdirSync(config.uploadDir, { recursive: true });
+            }
+
+            fs.writeFileSync(storagePath, encrypted.encryptedBuffer);
+
+            mediaData = {
+                has_media: true,
+                media_type: validated.fileType,
+                encrypted_file_path: encryptedFilename,
+                original_filename: req.file.originalname,
+                mime_type: validated.mimeType,
+                file_size: req.file.size,
+                iv: encrypted.ivHex,
+                auth_tag: encrypted.authTagHex,
+            };
+        }
+
         const chatMessage = await ChatMessage.create({
             theatre_id: theatreId,
             user_id: targetCustomerUserId,
             sender_id: currentUser.id,
             sender_role: currentUser.role,
-            message: message.trim(),
+            message: rawMessage,
             booking_id: bookingId || null,
             is_read: 0,
+            ...mediaData,
         });
 
         // Send in-app notification to the counterparty
+        const notificationSnippet = rawMessage || (mediaData.media_type === 'VIDEO' ? 'Sent an encrypted video 🎥' : 'Sent an encrypted media attachment 📎');
         if (currentUser.role === 'CUSTOMER') {
             const theatre = await Theatre.findById(theatreId);
             let recipientId = theatre?.owner_id;
@@ -255,7 +311,7 @@ export async function sendMessage(req, res, next) {
                     recipientId,
                     bookingId || undefined,
                     `New Message from ${currentUser.name}`,
-                    `${message.trim().substring(0, 100)}...`,
+                    `${notificationSnippet.substring(0, 100)}...`,
                     'GENERAL'
                 );
             }
@@ -265,7 +321,7 @@ export async function sendMessage(req, res, next) {
                 targetCustomerUserId,
                 bookingId || undefined,
                 `Message from ${theatre?.name || 'Theatre Admin'}`,
-                `${message.trim().substring(0, 100)}...`,
+                `${notificationSnippet.substring(0, 100)}...`,
                 'GENERAL'
             );
         }
@@ -280,12 +336,89 @@ export async function sendMessage(req, res, next) {
                 sender_id: currentUser.id,
                 sender_name: currentUser.name,
                 sender_role: currentUser.role,
-                message: message.trim(),
+                message: rawMessage,
+                has_media: chatMessage.has_media,
+                media_type: chatMessage.media_type,
+                original_filename: chatMessage.original_filename,
+                mime_type: chatMessage.mime_type,
+                file_size: chatMessage.file_size,
                 booking_id: bookingId || null,
                 is_read: 0,
                 created_at: chatMessage.created_at || new Date().toISOString(),
             },
         });
+    }
+    catch (error) {
+        next(error);
+    }
+}
+
+export async function streamChatMessageMedia(req, res, next) {
+    try {
+        const messageId = req.params.id;
+        const chatMessage = await ChatMessage.findById(messageId);
+
+        if (!chatMessage || !chatMessage.has_media || !chatMessage.encrypted_file_path) {
+            res.status(404).json({ success: false, message: 'Encrypted media message not found.' });
+            return;
+        }
+
+        const user = req.user;
+        const customerId = chatMessage.user_id?.toString();
+        const theatreId = chatMessage.theatre_id?.toString();
+
+        // Access Control
+        if (user.role === 'CUSTOMER' && customerId !== user.id) {
+            res.status(403).json({ success: false, message: 'Unauthorized to view this encrypted media.' });
+            return;
+        }
+
+        if (user.role === 'STAFF') {
+            const isAssigned = await TheatreStaff.findOne({ theatre_id: theatreId, user_id: user.id });
+            const isOwner = await Theatre.findOne({ _id: theatreId, owner_id: user.id });
+            if (!isAssigned && !isOwner) {
+                res.status(403).json({ success: false, message: 'Unauthorized to view media for this theatre.' });
+                return;
+            }
+        }
+
+        const filePath = path.join(config.uploadDir, chatMessage.encrypted_file_path);
+        if (!fs.existsSync(filePath)) {
+            res.status(404).json({ success: false, message: 'Encrypted media file not found on disk.' });
+            return;
+        }
+
+        const encryptedBuffer = fs.readFileSync(filePath);
+        // Decrypt on-the-fly using AES-256-GCM authenticated tag
+        const decryptedBuffer = decryptBuffer(encryptedBuffer, chatMessage.iv, chatMessage.auth_tag);
+
+        const totalSize = decryptedBuffer.length;
+        const range = req.headers.range;
+
+        // Support HTTP 206 Partial Content byte ranges for smooth video seeking & streaming
+        if (range) {
+            const parts = range.replace(/bytes=/, '').split('-');
+            const start = parseInt(parts[0], 10);
+            const end = parts[1] ? parseInt(parts[1], 10) : totalSize - 1;
+            const chunkSize = (end - start) + 1;
+            const slice = decryptedBuffer.subarray(start, end + 1);
+
+            res.writeHead(206, {
+                'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+                'Accept-Ranges': 'bytes',
+                'Content-Length': chunkSize,
+                'Content-Type': chatMessage.mime_type || 'video/mp4',
+                'Cache-Control': 'private, no-cache, no-store, must-revalidate',
+            });
+            res.end(slice);
+        } else {
+            res.setHeader('Content-Type', chatMessage.mime_type || 'video/mp4');
+            res.setHeader('Content-Length', totalSize);
+            res.setHeader('Accept-Ranges', 'bytes');
+            res.setHeader('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+            res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(chatMessage.original_filename || 'media')}"`);
+            res.send(decryptedBuffer);
+        }
     }
     catch (error) {
         next(error);
