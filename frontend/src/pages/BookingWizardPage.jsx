@@ -2,18 +2,41 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.js';
-import { ScreenMockupPreview } from '../components/ScreenMockupPreview.js';
-import { Sparkles, Building2, Clock, Upload, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Calendar, Phone, Check, } from 'lucide-react';
+import { ScreenMockupPreview } from '../components/ScreenMockupPreview.jsx';
+import { ReceiptModal } from '../components/ReceiptModal.jsx';
+import { WalletTopupModal } from '../components/WalletTopupModal.jsx';
+import {
+    Sparkles,
+    Building2,
+    Clock,
+    Upload,
+    AlertCircle,
+    CheckCircle2,
+    ArrowRight,
+    ArrowLeft,
+    Calendar,
+    Phone,
+    Check,
+    CreditCard,
+    QrCode,
+    ShieldCheck,
+    Zap,
+    Plus,
+} from 'lucide-react';
+
 export const BookingWizardPage = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { user, refreshUser } = useAuth();
+
     // Wizard Steps (1 through 8)
     const [step, setStep] = useState(1);
+
     // Loaded Data
     const [theatres, setTheatres] = useState([]);
     const [shows, setShows] = useState([]);
     const [loading, setLoading] = useState(true);
+
     // Form State
     const [selectedTheatreId, setSelectedTheatreId] = useState(null);
     const [selectedShowId, setSelectedShowId] = useState(null);
@@ -23,6 +46,15 @@ export const BookingWizardPage = () => {
     const [mediaFile, setMediaFile] = useState(null);
     const [mediaPreviewUrl, setMediaPreviewUrl] = useState(null);
     const [mediaType, setMediaType] = useState(null);
+
+    // Payment & Modal State
+    const [paymentMethod, setPaymentMethod] = useState('WALLET'); // 'WALLET' | 'UPI' | 'CARD'
+    const [showWalletModal, setShowWalletModal] = useState(false);
+    const [activeReceipt, setActiveReceipt] = useState(null);
+    const [cardNumber, setCardNumber] = useState('');
+    const [cardExpiry, setCardExpiry] = useState('');
+    const [cardCvv, setCardCvv] = useState('');
+
     // Submission State
     const [submitting, setSubmitting] = useState(false);
     const [errorMessage, setErrorMessage] = useState(null);
@@ -116,17 +148,76 @@ export const BookingWizardPage = () => {
         try {
             setSubmitting(true);
             setErrorMessage(null);
+
+            let paymentId = `pay_${Date.now()}`;
+            let orderId = `order_${Date.now()}`;
+
+            // If paying via UPI or Card, process gateway verification
+            if (paymentMethod !== 'WALLET') {
+                const orderRes = await api.payments.createOrder({
+                    amount: Number(selectedShow?.price_estimate || 500),
+                    currency: 'INR',
+                    showId: selectedShowId,
+                    bookingType,
+                });
+                orderId = orderRes.order?.orderId || orderId;
+
+                const verifyRes = await api.payments.verifyPayment({
+                    orderId,
+                    paymentId,
+                    signature: 'sig_verified_mock_success',
+                    paymentMethod,
+                });
+                paymentId = verifyRes.result?.paymentId || paymentId;
+            }
+
             const formData = new FormData();
             formData.append('showId', selectedShowId.toString());
             formData.append('bookingType', bookingType);
             formData.append('message', message.trim());
+            formData.append('paymentMethod', paymentMethod);
+            formData.append('paymentId', paymentId);
+            formData.append('orderId', orderId);
             if (contactPhone)
                 formData.append('contactPhone', contactPhone.trim());
             if (mediaFile)
                 formData.append('media', mediaFile);
-            await api.bookings.create(formData);
+
+            const res = await api.bookings.create(formData);
             await refreshUser?.();
-            navigate('/dashboard?success=1');
+
+            // Build digital receipt for immediate display
+            const receipt = {
+                receiptNumber: `REC-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`,
+                date: new Date().toISOString(),
+                customer: {
+                    name: user.name,
+                    email: user.email,
+                    phone: contactPhone || user.phone,
+                },
+                theatre: {
+                    name: selectedTheatre?.name,
+                    address: selectedTheatre?.address,
+                    city: selectedTheatre?.city,
+                },
+                booking: {
+                    id: res.bookingId,
+                    type: bookingType,
+                    status: 'PENDING',
+                    message: message.trim(),
+                    movieTitle: selectedShow?.movie_title,
+                    showDate: selectedShow?.show_date,
+                    intervalSlot: `${selectedShow?.interval_start} - ${selectedShow?.interval_end}`,
+                },
+                payment: {
+                    totalAmount: Number(selectedShow?.price_estimate || 500),
+                    paymentMethod,
+                    paymentId,
+                    status: 'COMPLETED',
+                },
+            };
+
+            setActiveReceipt(receipt);
         }
         catch (err) {
             setErrorMessage(err.message || 'Failed to submit booking request.');
@@ -507,36 +598,187 @@ export const BookingWizardPage = () => {
               </div>
             </div>
 
-            {/* Wallet & Escrow Summary */}
-            <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3 text-xs">
-              <span className="font-bold text-amber-400 uppercase tracking-wider block">
-                💳 Wallet Billing & Escrow Summary
-              </span>
-              <div className="flex justify-between text-slate-300">
-                <span>Interval Screening Fee:</span>
-                <span className="font-bold text-white">₹{Number(selectedShow?.price_estimate || 500).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-slate-300">
-                <span>Current Wallet Balance:</span>
-                <span className="font-bold text-white">₹{Number(user?.wallet_balance ?? 2000).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between border-t border-amber-500/20 pt-2 text-amber-300 font-bold">
-                <span>Remaining Balance after Booking:</span>
-                <span>
-                  ₹{(Number(user?.wallet_balance ?? 2000) - Number(selectedShow?.price_estimate || 500)).toFixed(2)}
+            {/* Step 8: Payment Gateway & Escrow Summary */}
+            <div className="p-6 rounded-2xl bg-cinema-900 border border-cinema-700 space-y-5 text-xs">
+              <div className="flex items-center justify-between border-b border-cinema-800 pb-3">
+                <span className="font-bold text-amber-400 uppercase tracking-wider text-sm flex items-center gap-2">
+                  <CreditCard className="w-4 h-4" />
+                  Select Payment Method
+                </span>
+                <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Escrow Protected
                 </span>
               </div>
-              {Number(user?.wallet_balance ?? 2000) < Number(selectedShow?.price_estimate || 500) && (
-                <p className="text-red-400 font-bold pt-1">
-                  ⚠️ Insufficient wallet balance to complete this booking.
-                </p>
+
+              {/* Payment Method Selector Tabs */}
+              <div className="grid grid-cols-3 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('WALLET')}
+                  className={`p-3 rounded-xl border text-center transition-all ${
+                    paymentMethod === 'WALLET'
+                      ? 'bg-amber-500/15 border-amber-500 text-white shadow-md shadow-amber-500/10'
+                      : 'bg-cinema-950 border-cinema-800 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span className="block text-base mb-1">💳</span>
+                  <span className="font-bold block text-xs">Wallet</span>
+                  <span className="text-[10px] text-slate-500">
+                    Bal: ₹{Number(user?.wallet_balance ?? 2000).toFixed(0)}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('UPI')}
+                  className={`p-3 rounded-xl border text-center transition-all ${
+                    paymentMethod === 'UPI'
+                      ? 'bg-amber-500/15 border-amber-500 text-white shadow-md shadow-amber-500/10'
+                      : 'bg-cinema-950 border-cinema-800 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span className="block text-base mb-1">📱</span>
+                  <span className="font-bold block text-xs">Instant UPI</span>
+                  <span className="text-[10px] text-slate-500">QR / GPay / PhonePe</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('CARD')}
+                  className={`p-3 rounded-xl border text-center transition-all ${
+                    paymentMethod === 'CARD'
+                      ? 'bg-amber-500/15 border-amber-500 text-white shadow-md shadow-amber-500/10'
+                      : 'bg-cinema-950 border-cinema-800 text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  <span className="block text-base mb-1">⚡</span>
+                  <span className="font-bold block text-xs">Card / NetBanking</span>
+                  <span className="text-[10px] text-slate-500">Razorpay / Stripe</span>
+                </button>
+              </div>
+
+              {/* Wallet Method View */}
+              {paymentMethod === 'WALLET' && (
+                <div className="p-4 rounded-xl bg-cinema-950 border border-cinema-800 space-y-2.5">
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Available Balance:</span>
+                    <span className="font-bold text-white">₹{Number(user?.wallet_balance ?? 2000).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-slate-300">
+                    <span>Interval Booking Fee:</span>
+                    <span className="font-bold text-white">₹{Number(selectedShow?.price_estimate || 500).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-t border-cinema-800 pt-2 text-amber-300 font-bold">
+                    <span>Remaining Wallet Balance:</span>
+                    <span>
+                      ₹{(Number(user?.wallet_balance ?? 2000) - Number(selectedShow?.price_estimate || 500)).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {Number(user?.wallet_balance ?? 2000) < Number(selectedShow?.price_estimate || 500) && (
+                    <div className="pt-2 flex items-center justify-between bg-red-950/40 p-2.5 rounded-lg border border-red-800/60">
+                      <span className="text-red-400 font-medium">Insufficient balance.</span>
+                      <button
+                        type="button"
+                        onClick={() => setShowWalletModal(true)}
+                        className="px-3 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs flex items-center gap-1 shadow-sm"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Top Up Wallet
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
+
+              {/* UPI QR Code View */}
+              {paymentMethod === 'UPI' && (
+                <div className="p-4 rounded-xl bg-cinema-950 border border-cinema-800 space-y-3">
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 h-24 bg-white p-2 rounded-xl flex items-center justify-center shrink-0 shadow-md">
+                      <QrCode className="w-full h-full text-black" />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-xs font-bold text-white block">Scan & Pay via any UPI App</span>
+                      <span className="text-[11px] text-slate-400 block font-mono">VPA: cinemoments@upi</span>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        <span className="px-2 py-0.5 rounded bg-cinema-800 text-slate-300 text-[10px] font-semibold">GPay</span>
+                        <span className="px-2 py-0.5 rounded bg-cinema-800 text-slate-300 text-[10px] font-semibold">PhonePe</span>
+                        <span className="px-2 py-0.5 rounded bg-cinema-800 text-slate-300 text-[10px] font-semibold">Paytm</span>
+                        <span className="px-2 py-0.5 rounded bg-cinema-800 text-slate-300 text-[10px] font-semibold">BHIM</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[11px] flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <span>Instant UPI confirmation enabled. Click Submit to verify and reserve.</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Card / Gateway View */}
+              {paymentMethod === 'CARD' && (
+                <div className="p-4 rounded-xl bg-cinema-950 border border-cinema-800 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-slate-200">Debit / Credit Card Details</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCardNumber('4242 •••• •••• 4242');
+                        setCardExpiry('12/28');
+                        setCardCvv('789');
+                      }}
+                      className="text-[10px] text-amber-400 hover:text-amber-300 font-bold underline"
+                    >
+                      Fill Demo Test Card
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Card Number"
+                      value={cardNumber}
+                      onChange={(e) => setCardNumber(e.target.value)}
+                      className="w-full px-3 py-2 rounded-lg bg-cinema-900 border border-cinema-700 text-white text-xs focus:outline-none focus:border-amber-400 font-mono"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        placeholder="MM / YY"
+                        value={cardExpiry}
+                        onChange={(e) => setCardExpiry(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg bg-cinema-900 border border-cinema-700 text-white text-xs focus:outline-none focus:border-amber-400 font-mono"
+                      />
+                      <input
+                        type="password"
+                        placeholder="CVV"
+                        maxLength={4}
+                        value={cardCvv}
+                        onChange={(e) => setCardCvv(e.target.value)}
+                        className="w-full px-3 py-2 rounded-lg bg-cinema-900 border border-cinema-700 text-white text-xs focus:outline-none focus:border-amber-400 font-mono"
+                      />
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-slate-500 block">
+                    Powered by Razorpay & Stripe Gateway Engine.
+                  </span>
+                </div>
+              )}
+
+              {/* Total Payable & Guarantee */}
+              <div className="pt-2 border-t border-cinema-800 flex justify-between items-center text-sm">
+                <span className="text-slate-300 font-medium">Total Payable Amount:</span>
+                <span className="font-black text-amber-400 text-base">
+                  ₹{Number(selectedShow?.price_estimate || 500).toFixed(2)}
+                </span>
+              </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-cinema-800 text-xs text-slate-300 leading-relaxed border border-cinema-700">
+            <div className="p-4 rounded-xl bg-cinema-800/80 text-xs text-slate-300 leading-relaxed border border-cinema-700/80">
               🛡️ Upon submission, your request enters <strong className="text-amber-400">PENDING</strong>{' '}
               status. The theatre staff will review your content. If rejected or cancelled,
-              funds are 100% refunded immediately to your wallet.
+              funds are 100% refunded immediately to your account.
             </div>
           </div>)}
       </div>
@@ -549,9 +791,32 @@ export const BookingWizardPage = () => {
 
         {step < 8 ? (<button type="button" onClick={handleNext} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-cinema-gold to-amber-400 hover:from-amber-400 hover:to-cinema-gold text-cinema-950 text-sm font-bold shadow-md shadow-cinema-gold/20 transition-all">
             Continue <ArrowRight className="w-4 h-4"/>
-          </button>) : (<button type="button" onClick={handleSubmit} disabled={submitting || (Number(user?.wallet_balance ?? 2000) < Number(selectedShow?.price_estimate || 500))} className="flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-sm font-bold shadow-lg shadow-emerald-500/30 transition-all disabled:opacity-50">
-            {submitting ? 'Submitting Request...' : 'Confirm & Submit Booking Request'}
+          </button>) : (<button
+            type="button"
+            onClick={handleSubmit}
+            disabled={submitting || (paymentMethod === 'WALLET' && Number(user?.wallet_balance ?? 2000) < Number(selectedShow?.price_estimate || 500))}
+            className="flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-sm font-bold shadow-lg shadow-emerald-500/30 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            {submitting ? 'Processing Payment & Submitting...' : `Pay ₹${Number(selectedShow?.price_estimate || 500).toFixed(2)} & Reserve Slot`}
           </button>)}
       </div>
+
+      {/* Digital Receipt Modal */}
+      {activeReceipt && (
+        <ReceiptModal
+          receipt={activeReceipt}
+          onClose={() => {
+            setActiveReceipt(null);
+            navigate('/dashboard?success=1');
+          }}
+        />
+      )}
+
+      {/* Wallet Top-up Modal */}
+      <WalletTopupModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
+      />
     </div>);
 };
+

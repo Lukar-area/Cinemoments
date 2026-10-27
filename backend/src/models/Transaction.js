@@ -20,6 +20,15 @@ const transactionSchema = new mongoose.Schema(
     total_amount: { type: Number, required: true },
     theatre_share: { type: Number, required: true },
     admin_share: { type: Number, required: true },
+    payment_method: {
+      type: String,
+      default: 'WALLET',
+      enum: ['WALLET', 'RAZORPAY', 'STRIPE', 'UPI'],
+    },
+    payment_id: { type: String, default: null },
+    order_id: { type: String, default: null },
+    receipt_number: { type: String, default: null },
+    currency: { type: String, default: 'INR' },
     status: {
       type: String,
       required: true,

@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.js';
 import { useNotifications } from '../context/NotificationContext.js';
-import { Film, Bell, User as UserIcon, LogOut, Sparkles, Menu, X, CheckCheck, ShieldCheck, Ticket, } from 'lucide-react';
+import { Film, Bell, User as UserIcon, LogOut, Sparkles, Menu, X, CheckCheck, ShieldCheck, Ticket, Plus, } from 'lucide-react';
+import { WalletTopupModal } from './WalletTopupModal.jsx';
 export const Navbar = () => {
     const { user, logout } = useAuth();
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
@@ -11,6 +12,7 @@ export const Navbar = () => {
     const [showNotifs, setShowNotifs] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [showWalletModal, setShowWalletModal] = useState(false);
     const notifRef = useRef(null);
     const userMenuRef = useRef(null);
     // Close popups on click outside
@@ -90,12 +92,20 @@ export const Navbar = () => {
 
           {/* Right Action Icons & Profile */}
           <div className="flex items-center gap-3">
-            {/* Wallet Balance Badge */}
+            {/* Wallet Balance Badge with Quick Top-Up */}
             {user && (
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs font-semibold text-amber-300">
+              <button
+                type="button"
+                onClick={() => setShowWalletModal(true)}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-xs font-semibold text-amber-300 transition-all cursor-pointer group"
+                title="Click to Add Funds to Wallet"
+              >
                 <span className="text-amber-400">💳</span>
                 <span>₹{Number(user.wallet_balance ?? 2000).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              </div>
+                <span className="w-4 h-4 rounded-full bg-amber-500/20 text-amber-300 flex items-center justify-center text-[10px] font-bold group-hover:bg-amber-400 group-hover:text-black transition-colors ml-0.5">
+                  <Plus className="w-3 h-3" />
+                </span>
+              </button>
             )}
 
             {/* Notification Bell (Logged in only) */}
@@ -238,5 +248,8 @@ export const Navbar = () => {
               Admin Panel
             </Link>)}
         </div>)}
+
+      {/* Wallet Recharge Modal */}
+      <WalletTopupModal isOpen={showWalletModal} onClose={() => setShowWalletModal(false)} />
     </nav>);
 };

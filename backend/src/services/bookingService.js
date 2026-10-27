@@ -46,11 +46,18 @@ export async function createBooking(input) {
         throw new Error('This interval slot has already been booked and accepted.');
     }
 
-    // Check user wallet balance
+    // Financial calculation
     const amount = Number(show.price_estimate || 500.0);
+    const paymentMethod = input.paymentMethod || 'WALLET';
     const user = await User.findById(input.userId);
-    if (!user || Number(user.wallet_balance || 0) < amount) {
-        throw new Error(`Insufficient wallet balance. Booking requires ₹${amount}, but your current wallet balance is ₹${user ? user.wallet_balance : 0}.`);
+
+    // If paying via wallet, verify sufficient balance
+    if (paymentMethod === 'WALLET') {
+        if (!user || Number(user.wallet_balance || 0) < amount) {
+            throw new Error(`Insufficient wallet balance. Booking requires ₹${amount}, but your current wallet balance is ₹${user ? user.wallet_balance : 0}.`);
+        }
+        // Deduct full amount from user wallet
+        await User.findByIdAndUpdate(input.userId, { $inc: { wallet_balance: -amount } });
     }
 
     // Insert booking request
@@ -71,9 +78,6 @@ export async function createBooking(input) {
     const theatreShare = Math.round(amount * 0.8 * 100) / 100;
     const adminShare = Math.round(amount * 0.2 * 100) / 100;
 
-    // Deduct full amount from user wallet
-    await User.findByIdAndUpdate(input.userId, { $inc: { wallet_balance: -amount } });
-
     // Credit 80% to Theatre Owner (owner_id or first assigned staff)
     let ownerId = theatre ? theatre.owner_id : null;
     if (!ownerId && theatreId) {
@@ -89,16 +93,36 @@ export async function createBooking(input) {
     // Credit 20% to Super Admin
     await User.findOneAndUpdate({ role: 'ADMIN' }, { $inc: { wallet_balance: adminShare } });
 
+    const receiptNumber = `REC-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+
     // Record completed transaction
-    await Transaction.create({
+    const transaction = await Transaction.create({
         booking_id: booking._id,
         user_id: input.userId,
         theatre_id: theatreId,
         total_amount: amount,
         theatre_share: theatreShare,
         admin_share: adminShare,
+        payment_method: paymentMethod,
+        payment_id: input.paymentId || (paymentMethod === 'WALLET' ? `wal_${Date.now()}` : `pay_${Date.now()}`),
+        order_id: input.orderId || null,
+        receipt_number: receiptNumber,
         status: 'COMPLETED',
     });
+
+    // Dispatch booking submission notifications (in-app, email, SMS)
+    await createNotification(
+        input.userId,
+        booking._id,
+        'Booking Request Submitted 🎬',
+        `Your interval booking request for "${show.movie_id?.title || 'the movie'}" has been submitted and is pending theatre review.`,
+        'BOOKING_SUBMITTED',
+        {
+            movieTitle: show.movie_id?.title,
+            theatreName: theatre?.name,
+            intervalTime: `${show.interval_start} - ${show.interval_end}`,
+        }
+    );
 
     // If media was attached, validate magic bytes, encrypt with AES-256-GCM, and save to disk
     if (input.mediaFile) {
@@ -207,13 +231,18 @@ export async function acceptBooking(bookingId, staffUserId, ipAddress) {
     const movieTitle = booking.show_id?.movie_id?.title || 'Movie';
     const theatreName = booking.show_id?.screen_id?.theatre_id?.name || 'Theatre';
 
-    // Create in-app notifications
+    // Create in-app notifications and email/SMS alerts
     await createNotification(
         booking.user_id,
         booking._id,
         'Booking Accepted! 🎉',
         `Your interval booking for "${movieTitle}" at ${theatreName} has been ACCEPTED!`,
-        'ACCEPTED'
+        'ACCEPTED',
+        {
+            movieTitle,
+            theatreName,
+            intervalTime: `${booking.show_id?.interval_start || '21:00'} - ${booking.show_id?.interval_end || '21:15'}`,
+        }
     );
 
     for (const comp of competing) {
@@ -222,7 +251,11 @@ export async function acceptBooking(bookingId, staffUserId, ipAddress) {
             comp._id,
             'Booking Expired & Wallet Refunded',
             `Your booking request for "${movieTitle}" has expired because another request was selected. Your wallet has been refunded.`,
-            'EXPIRED'
+            'EXPIRED',
+            {
+                movieTitle,
+                theatreName,
+            }
         );
     }
 
@@ -289,7 +322,8 @@ export async function rejectBooking(bookingId, staffUserId, reason, ipAddress) {
         booking._id,
         'Booking Request Rejected & Refunded',
         `Your booking request for "${movieTitle}" at ${theatreName} was rejected and refunded. ${reason ? 'Reason: ' + reason : ''}`,
-        'REJECTED'
+        'REJECTED',
+        { movieTitle, theatreName, reason }
     );
 
     await recordAuditLog({

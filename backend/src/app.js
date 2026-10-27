@@ -13,6 +13,8 @@ import mediaRoutes from './routes/mediaRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import { isDBConnected } from './db/database.js';
 const app = express();
 // Security HTTP headers
 app.use(helmet({
@@ -40,6 +42,7 @@ app.use('/api', generalApiLimiter);
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'healthy',
+        database: isDBConnected() ? 'connected' : 'disconnected',
         timestamp: new Date().toISOString(),
         service: 'CineMoments API',
     });
@@ -54,6 +57,7 @@ app.use('/api/media', mediaRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/payments', paymentRoutes);
 // Global Error Handler
 app.use(errorHandler);
 export default app;

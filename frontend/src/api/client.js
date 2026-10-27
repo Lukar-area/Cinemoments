@@ -143,4 +143,19 @@ export const api = {
                 body: JSON.stringify(data),
             }),
     },
+    payments: {
+        createOrder: (data) => request('/payments/create-order', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        verifyPayment: (data) => request('/payments/verify', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        topupWallet: (data) => request('/payments/wallet/topup', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
+        getReceipt: (transactionId) => request(`/payments/receipt/${transactionId}`),
+    },
 };

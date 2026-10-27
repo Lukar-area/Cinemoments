@@ -10,4 +10,21 @@ export const config = {
     uploadDir: path.resolve(process.env.UPLOAD_DIR || './uploads'),
     mongodbUri: process.env.MONGODB_URI || 'mongodb://localhost:27017/cinemoments',
     clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+    // Payment configuration
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID || 'rzp_test_cinemoments_demo',
+    razorpayKeySecret: process.env.RAZORPAY_KEY_SECRET || 'rzp_sec_test_secret_key_demo',
+    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY || 'pk_test_cinemoments_demo',
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY || 'sk_test_cinemoments_demo',
+    upiVpa: process.env.UPI_VPA || 'cinemoments@upi',
+    // Notification & alert configuration
+    emailServiceEnabled: process.env.EMAIL_SERVICE_ENABLED === 'true',
+    smtpHost: process.env.SMTP_HOST || 'smtp.mailtrap.io',
+    smtpPort: parseInt(process.env.SMTP_PORT || '2525', 10),
+    smtpUser: process.env.SMTP_USER || '',
+    smtpPass: process.env.SMTP_PASS || '',
+    smtpFrom: process.env.SMTP_FROM || 'CineMoments Alerts <notifications@cinemoments.com>',
+    smsServiceEnabled: process.env.SMS_SERVICE_ENABLED === 'true',
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID || '',
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN || '',
+    twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER || '',
 };

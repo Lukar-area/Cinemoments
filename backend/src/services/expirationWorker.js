@@ -60,7 +60,8 @@ export async function checkAndExpireRequests() {
                     booking._id,
                     'Booking Request Expired',
                     `Your request for "${movieTitle}" at ${theatreName} expired as the show start time has passed.`,
-                    'EXPIRED'
+                    'EXPIRED',
+                    { movieTitle, theatreName }
                 );
 
                 await recordAuditLog({

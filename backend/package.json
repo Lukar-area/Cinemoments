@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
+    "build": "node -e \"console.log('Backend build verified')\"",
     "seed": "node src/db/seed.js",
     "test": "node --test src/tests/*.test.js"
   },

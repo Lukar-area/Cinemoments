@@ -6,6 +6,8 @@ import { StatusBadge } from '../components/StatusBadge.jsx';
 import { MediaViewerModal } from '../components/MediaViewerModal.jsx';
 import { ConfirmationModal } from '../components/ConfirmationModal.jsx';
 import { ChatDrawerModal } from '../components/ChatDrawerModal.jsx';
+import { ReceiptModal } from '../components/ReceiptModal.jsx';
+import { WalletTopupModal } from '../components/WalletTopupModal.jsx';
 import {
   Clock,
   CheckCircle2,
@@ -21,6 +23,8 @@ import {
   Wallet,
   ArrowDownLeft,
   ArrowUpRight,
+  Receipt,
+  Plus,
 } from 'lucide-react';
 
 export const CustomerDashboardPage = () => {
@@ -52,6 +56,40 @@ export const CustomerDashboardPage = () => {
     theatreName: '',
     bookingId: null,
   });
+
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [activeReceipt, setActiveReceipt] = useState(null);
+
+  const openReceiptForBooking = (b) => {
+    setActiveReceipt({
+      receiptNumber: `REC-${new Date(b.created_at || Date.now()).getFullYear()}-${b.id.slice(-6).toUpperCase()}`,
+      date: b.created_at,
+      customer: {
+        name: user?.name || 'Customer',
+        email: user?.email,
+        phone: b.contact_phone || user?.phone,
+      },
+      theatre: {
+        name: b.theatre_name || 'Grand Palace Cinema',
+        city: b.city || 'Auditorium Complex',
+      },
+      booking: {
+        id: b.id,
+        type: b.booking_type,
+        status: b.status,
+        message: b.message,
+        movieTitle: b.movie_title || 'Feature Presentation',
+        showDate: b.show_date,
+        intervalSlot: `${b.interval_start} - ${b.interval_end}`,
+      },
+      payment: {
+        totalAmount: 500,
+        paymentMethod: 'WALLET / ESCROW',
+        paymentId: `TXN-${b.id}`,
+        status: b.status === 'REJECTED' || b.status === 'EXPIRED' || b.status === 'CANCELLED' ? 'REFUNDED' : 'COMPLETED',
+      },
+    });
+  };
 
   // Success notice
   const [showSuccessBanner, setShowSuccessBanner] = useState(false);
@@ -132,6 +170,15 @@ export const CustomerDashboardPage = () => {
                 ₹{Number(user?.wallet_balance ?? 2000).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
             </div>
+            <button
+              type="button"
+              onClick={() => setShowWalletModal(true)}
+              className="ml-1 px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+              title="Add Funds"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add</span>
+            </button>
           </div>
 
           <Link
@@ -351,6 +398,15 @@ export const CustomerDashboardPage = () => {
                       Details
                     </button>
 
+                    <button
+                      onClick={() => openReceiptForBooking(booking)}
+                      className="px-3 py-2 rounded-xl bg-cinema-800 hover:bg-cinema-750 text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5 border border-cinema-750"
+                      title="View Digital Receipt"
+                    >
+                      <Receipt className="w-3.5 h-3.5 text-amber-400" />
+                      Receipt
+                    </button>
+
                     {(booking.status === 'PENDING' || booking.status === 'UNDER_REVIEW') && (
                       <button
                         onClick={() => setCancellingBookingId(booking.id)}
@@ -532,6 +588,20 @@ export const CustomerDashboardPage = () => {
         theatreId={chatState.theatreId}
         theatreName={chatState.theatreName}
         bookingId={chatState.bookingId}
+      />
+
+      {/* Digital Receipt Modal */}
+      {activeReceipt && (
+        <ReceiptModal
+          receipt={activeReceipt}
+          onClose={() => setActiveReceipt(null)}
+        />
+      )}
+
+      {/* Wallet Top-up Modal */}
+      <WalletTopupModal
+        isOpen={showWalletModal}
+        onClose={() => setShowWalletModal(false)}
       />
     </div>
   );

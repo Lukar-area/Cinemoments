@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 .dist/
+_backup_ts/
 
 # Database files
 *.sqlite

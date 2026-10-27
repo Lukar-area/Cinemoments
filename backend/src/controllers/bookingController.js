@@ -16,7 +16,7 @@ import TheatreStaff from '../models/TheatreStaff.js';
 export async function submitBooking(req, res, next) {
     try {
         const userId = req.user.id;
-        const { showId, bookingType, message, contactPhone } = req.body;
+        const { showId, bookingType, message, contactPhone, paymentMethod, paymentId, orderId } = req.body;
         if (!showId || !bookingType || !message) {
             res.status(400).json({ success: false, message: 'Show, booking purpose, and message are required.' });
             return;
@@ -27,6 +27,9 @@ export async function submitBooking(req, res, next) {
             bookingType,
             message,
             contactPhone,
+            paymentMethod,
+            paymentId,
+            orderId,
             mediaFile: req.file,
             ipAddress: req.ip,
         });

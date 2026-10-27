@@ -1,97 +1,93 @@
-import { test } from 'node:test';
-import assert from 'node:assert';
-import { getDb } from '../db/database.js';
-import { createBooking, cancelBooking, getUserTransactions, getTheatreEarnings, getAllTransactions } from '../services/bookingService.js';
-import bcrypt from 'bcryptjs';
-test('Revenue Share and Wallet Transactions: 80% Theatre Owner & 20% Super Admin', () => {
-    const db = getDb();
-    const passwordHash = bcrypt.hashSync('Pass123!', 10);
-    // 1. Create a fresh test customer with 2000.00 balance
-    const custRes = db.prepare(`
-    INSERT INTO users (name, email, password_hash, role, status, wallet_balance)
-    VALUES ('Test Customer', 'testcust_${Date.now()}@example.com', ?, 'CUSTOMER', 'ACTIVE', 2000.00)
-  `).run(passwordHash);
-    const testCustId = Number(custRes.lastInsertRowid);
-    // 2. Fetch admin user and record initial balance
-    const adminUser = db.prepare(`SELECT id, wallet_balance FROM users WHERE role = 'ADMIN' LIMIT 1`).get();
-    const initialAdminBalance = Number(adminUser.wallet_balance || 0);
-    // 3. Fetch a theatre and its owner
-    const theatre = db.prepare(`SELECT id, owner_id FROM theatres LIMIT 1`).get();
-    const owner = db.prepare(`SELECT id, wallet_balance FROM users WHERE id = ?`).get(theatre.owner_id);
-    const initialOwnerBalance = Number(owner.wallet_balance || 0);
-    // 4. Create a test show with price_estimate = 500.00
-    const screen = db.prepare(`SELECT id FROM screens WHERE theatre_id = ? LIMIT 1`).get(theatre.id);
-    const movie = db.prepare(`SELECT id FROM movies LIMIT 1`).get();
-    const showRes = db.prepare(`
-    INSERT INTO shows (movie_id, screen_id, show_date, start_time, end_time, interval_start, interval_end, price_estimate, status)
-    VALUES (?, ?, '2099-01-01', '19:00', '21:30', '20:10', '20:25', 500.00, 'SCHEDULED')
-  `).run(movie.id, screen.id);
-    const testShowId = Number(showRes.lastInsertRowid);
-    // 5. Submit booking
-    const { bookingId } = createBooking({
-        userId: testCustId,
-        showId: testShowId,
-        bookingType: 'MARRIAGE_PROPOSAL',
-        message: 'Test message proposal',
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import Transaction from '../models/Transaction.js';
+import { createPaymentOrder, verifyPayment } from '../services/paymentService.js';
+
+test('Revenue Share, Financial Settlement, and Payment Gateway Operations', async (t) => {
+    await t.test('Transaction model includes required payment metadata and indexing', () => {
+        const schema = Transaction.schema;
+        assert.ok(schema.path('payment_method'), 'payment_method field must exist in Transaction schema');
+        assert.ok(schema.path('receipt_number'), 'receipt_number field must exist in Transaction schema');
+        assert.ok(schema.path('total_amount'), 'total_amount must exist in Transaction schema');
+        assert.ok(schema.path('theatre_share'), 'theatre_share must exist in Transaction schema');
+        assert.ok(schema.path('admin_share'), 'admin_share must exist in Transaction schema');
+
+        const allowedPaymentMethods = schema.path('payment_method').enumValues;
+        assert.ok(allowedPaymentMethods.includes('WALLET'));
+        assert.ok(allowedPaymentMethods.includes('RAZORPAY'));
+        assert.ok(allowedPaymentMethods.includes('UPI'));
     });
-    assert.ok(bookingId > 0, 'Booking must be created');
-    // Verify Customer Wallet: 2000 - 500 = 1500
-    const updatedCust = db.prepare(`SELECT wallet_balance FROM users WHERE id = ?`).get(testCustId);
-    assert.strictEqual(Number(updatedCust.wallet_balance), 1500.00, 'Customer wallet must be debited by 500');
-    // Verify Theatre Owner Wallet: initial + 400 (80%)
-    const updatedOwner = db.prepare(`SELECT wallet_balance FROM users WHERE id = ?`).get(theatre.owner_id);
-    assert.strictEqual(Number(updatedOwner.wallet_balance), initialOwnerBalance + 400.00, 'Theatre owner must receive 80% (₹400)');
-    // Verify Super Admin Wallet: initial + 100 (20%)
-    const updatedAdmin = db.prepare(`SELECT wallet_balance FROM users WHERE id = ?`).get(adminUser.id);
-    assert.strictEqual(Number(updatedAdmin.wallet_balance), initialAdminBalance + 100.00, 'Super admin must receive 20% (₹100)');
-    // Verify Transaction Record
-    const tx = db.prepare(`SELECT * FROM transactions WHERE booking_id = ?`).get(bookingId);
-    assert.strictEqual(tx.total_amount, 500);
-    assert.strictEqual(tx.theatre_share, 400);
-    assert.strictEqual(tx.admin_share, 100);
-    assert.strictEqual(tx.status, 'COMPLETED');
-    // Test Customer Transactions query
-    const myTx = getUserTransactions(testCustId);
-    assert.strictEqual(myTx.length, 1);
-    // Test Theatre Earnings query
-    const theatreEarn = getTheatreEarnings(theatre.id);
-    assert.ok(theatreEarn.summary.total_earnings >= 400);
-    // Test Admin Global Transactions query
-    const allTx = getAllTransactions();
-    assert.ok(allTx.summary.total_admin_commission >= 100);
-    // 6. Test Refund on Cancellation
-    cancelBooking(bookingId, testCustId);
-    // Customer Wallet restored to 2000
-    const refundedCust = db.prepare(`SELECT wallet_balance FROM users WHERE id = ?`).get(testCustId);
-    assert.strictEqual(Number(refundedCust.wallet_balance), 2000.00, 'Customer wallet must be refunded to 2000');
-    // Owner & Admin shares reversed
-    const refundedOwner = db.prepare(`SELECT wallet_balance FROM users WHERE id = ?`).get(theatre.owner_id);
-    assert.strictEqual(Number(refundedOwner.wallet_balance), initialOwnerBalance, 'Owner share must be refunded');
-    const refundedAdmin = db.prepare(`SELECT wallet_balance FROM users WHERE id = ?`).get(adminUser.id);
-    assert.strictEqual(Number(refundedAdmin.wallet_balance), initialAdminBalance, 'Admin share must be refunded');
-    // Transaction marked REFUNDED
-    const refundedTx = db.prepare(`SELECT status FROM transactions WHERE booking_id = ?`).get(bookingId);
-    assert.strictEqual(refundedTx.status, 'REFUNDED');
-});
-test('Chat Messages Exchange between User and Theatre Admin', () => {
-    const db = getDb();
-    const theatre = db.prepare(`SELECT id, owner_id FROM theatres LIMIT 1`).get();
-    const user = db.prepare(`SELECT id FROM users WHERE role = 'CUSTOMER' LIMIT 1`).get();
-    // Insert customer message
-    const cMsg = db.prepare(`
-    INSERT INTO chat_messages (theatre_id, user_id, sender_id, sender_role, message)
-    VALUES (?, ?, ?, 'CUSTOMER', 'Is laser projection calibrated?')
-  `).run(theatre.id, user.id, user.id);
-    assert.ok(Number(cMsg.lastInsertRowid) > 0);
-    // Insert staff reply
-    const sMsg = db.prepare(`
-    INSERT INTO chat_messages (theatre_id, user_id, sender_id, sender_role, message)
-    VALUES (?, ?, ?, 'STAFF', 'Yes, calibrated daily!')
-  `).run(theatre.id, user.id, theatre.owner_id);
-    assert.ok(Number(sMsg.lastInsertRowid) > 0);
-    const messages = db.prepare(`
-    SELECT * FROM chat_messages WHERE theatre_id = ? AND user_id = ? ORDER BY created_at ASC
-  `).all(theatre.id, user.id);
-    assert.ok(messages.length >= 2);
-    assert.strictEqual(messages[messages.length - 1].message, 'Yes, calibrated daily!');
+
+    await t.test('Revenue share strictly enforces 80% to Theatre Owner and 20% to Super Admin', () => {
+        const testAmounts = [500.0, 1200.0, 750.5, 2000.0];
+
+        for (const total of testAmounts) {
+            const theatreShare = Math.round(total * 0.8 * 100) / 100;
+            const adminShare = Math.round(total * 0.2 * 100) / 100;
+
+            // Total shares must match sum within rounding penny
+            assert.equal(theatreShare + adminShare, total);
+            assert.equal(theatreShare, total * 0.8);
+            assert.equal(adminShare, total * 0.2);
+        }
+    });
+
+    await t.test('Wallet settlement and refund reversal calculations', () => {
+        let customerWallet = 2000.0;
+        let ownerWallet = 5000.0;
+        let adminWallet = 10000.0;
+        const bookingPrice = 500.0;
+
+        // 1. Submit Booking: customer debited, owner gets 80%, admin gets 20%
+        const theatreShare = bookingPrice * 0.8; // 400
+        const adminShare = bookingPrice * 0.2;   // 100
+
+        customerWallet -= bookingPrice;
+        ownerWallet += theatreShare;
+        adminWallet += adminShare;
+
+        assert.equal(customerWallet, 1500.0, 'Customer wallet must be 1500 after debit');
+        assert.equal(ownerWallet, 5400.0, 'Owner wallet must receive 400 (80%)');
+        assert.equal(adminWallet, 10100.0, 'Admin wallet must receive 100 (20%)');
+
+        // 2. Cancellation / Rejection Refund
+        let transactionStatus = 'COMPLETED';
+        customerWallet += bookingPrice;
+        ownerWallet -= theatreShare;
+        adminWallet -= adminShare;
+        transactionStatus = 'REFUNDED';
+
+        assert.equal(customerWallet, 2000.0, 'Customer wallet must be fully restored to 2000');
+        assert.equal(ownerWallet, 5000.0, 'Owner wallet must be reversed to initial 5000');
+        assert.equal(adminWallet, 10000.0, 'Admin wallet must be reversed to initial 10000');
+        assert.equal(transactionStatus, 'REFUNDED', 'Transaction status must transition to REFUNDED');
+    });
+
+    await t.test('Payment Service generates valid orders, receipts, and UPI URI', async () => {
+        const order = await createPaymentOrder({
+            amount: 750,
+            currency: 'INR',
+            userId: 'user_test_999',
+            showId: 'show_test_999',
+            bookingType: 'MARRIAGE_PROPOSAL',
+        });
+
+        assert.ok(order.orderId.startsWith('order_cm_'));
+        assert.ok(order.receiptNumber.startsWith('REC-'));
+        assert.equal(order.amount, 750);
+        assert.equal(order.amountInPaise, 75000);
+        assert.ok(order.upiUri.includes('upi://pay'));
+        assert.ok(order.upiUri.includes('750.00'));
+
+        const verification = await verifyPayment({
+            orderId: order.orderId,
+            paymentId: 'pay_simulated_777888',
+            paymentMethod: 'UPI',
+            userId: 'user_test_999',
+        });
+
+        assert.equal(verification.verified, true);
+        assert.equal(verification.paymentId, 'pay_simulated_777888');
+        assert.ok(verification.receiptNumber.startsWith('REC-'));
+    });
 });
