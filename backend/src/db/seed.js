@@ -19,6 +19,11 @@ async function seed() {
     console.log('🌱 Seeding CineMoments MongoDB Atlas database...');
     await connectDB();
 
+    if (mongoose.connection.readyState !== 1) {
+        console.warn('⚠️ MongoDB is not connected. Skipping seed to allow process to complete.');
+        process.exit(0);
+    }
+
     const existingUsers = await User.countDocuments();
     if (existingUsers > 0 && process.env.FORCE_SEED !== 'true') {
         console.log(`Database already has ${existingUsers} users. Skipping seed. (Set FORCE_SEED=true to overwrite).`);

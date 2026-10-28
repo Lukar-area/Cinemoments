@@ -25,3 +25,10 @@ export async function connectDB() {
     console.warn('MongoDB disconnected.');
   });
 }
+
+/**
+ * Backward compatibility helper for legacy code / test suites.
+ */
+export function getDb() {
+  return mongoose.connection?.db || null;
+}

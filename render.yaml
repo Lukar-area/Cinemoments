@@ -12,17 +12,17 @@ services:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
-        value: mongodb+srv://jegansselvendran2007_db_user:P1UcbYVvJTkYCh2Q@cinemoments.ice7cu6.mongodb.net/?retryWrites=true&w=majority
+        sync: false
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: FILE_ENCRYPTION_KEY
-        value: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+        generateValue: true
       - key: UPLOAD_DIR
         value: ./uploads
       - key: CLIENT_URL
-        value: https://cinemoments-3sn2.onrender.com
+        sync: false
 
   # Frontend Static Site
   - type: web
@@ -33,7 +33,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://cinemoments-api-3sn2.onrender.com
+        sync: false
     headers:
       - path: /*
         name: Cache-Control

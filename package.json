@@ -1,8 +1,12 @@
 {
   "name": "cinemoments",
   "version": "1.0.0",
-  "description": "Cinema Interval Booking Platform",
+  "description": "Cinema Interval Booking Platform with TMDB Importer",
+  "type": "module",
   "scripts": {
+    "import:movies": "node scripts/importMovies.js",
+    "generate:diagrams": "node generate_diagrams.js",
+    "start:website": "node server.js",
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "seed": "npm --prefix backend run seed",
@@ -14,13 +18,15 @@
     "cinema",
     "interval-booking",
     "theatre",
-    "screenings"
+    "screenings",
+    "tmdb",
+    "mongodb"
   ],
   "author": "CineMoments Team",
   "license": "MIT",
-  "main": "generate_diagrams.js",
-  "directories": {
-    "doc": "docs"
-  },
-  "type": "commonjs"
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongodb": "^6.12.0"
+  }
 }

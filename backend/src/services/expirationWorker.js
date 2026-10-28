@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import IntervalBooking from '../models/IntervalBooking.js';
 import Show from '../models/Show.js';
 import Movie from '../models/Movie.js';
@@ -13,6 +14,9 @@ let intervalTimer = null;
  * or explicit expiration deadline has passed, and transitions them to EXPIRED.
  */
 export async function checkAndExpireRequests() {
+    if (mongoose.connection?.readyState !== 1) {
+        return 0;
+    }
     try {
         const now = new Date();
         const currentDateStr = now.toISOString().split('T')[0];
