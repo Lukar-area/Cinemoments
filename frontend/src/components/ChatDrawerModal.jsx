@@ -127,27 +127,27 @@ export const ChatDrawerModal = ({
       : customerName || 'Customer Support';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="w-full max-w-lg h-full bg-cinema-900 border-l border-cinema-700/80 shadow-2xl flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="w-full max-w-lg h-full bg-white border-l-2 border-[#CBC3E3] shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-cinema-700/80 bg-cinema-850 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-[#CBC3E3] bg-[#F8F6FC] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <div className="w-10 h-10 rounded-2xl bg-[#E6E6FA] border border-[#CBC3E3] flex items-center justify-center text-[#9F2B68] shadow-sm">
               {user?.role === 'CUSTOMER' ? (
-                <Building2 className="w-5 h-5" />
+                <Building2 className="w-5 h-5 text-[#9F2B68]" />
               ) : (
-                <UserIcon className="w-5 h-5" />
+                <UserIcon className="w-5 h-5 text-[#9F2B68]" />
               )}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm sm:text-base font-bold text-white leading-tight">
+                <h3 className="text-sm sm:text-base font-bold text-[#301934] leading-tight font-cinema">
                   {headerTitle}
                 </h3>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <p className="text-[11px] text-slate-400">
-                {bookingId ? `Regarding Booking #${bookingId}` : 'Direct Theatre Line'}
+              <p className="text-[11px] text-[#9F2B68] font-mono font-semibold">
+                {bookingId ? `Regarding Booking #${bookingId}` : 'Direct Theatre Projection Line'}
               </p>
             </div>
           </div>
@@ -155,14 +155,14 @@ export const ChatDrawerModal = ({
           <div className="flex items-center gap-2">
             <button
               onClick={() => loadMessages(false)}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-cinema-750 transition-colors"
+              className="p-2 rounded-lg text-[#483248] hover:text-[#9F2B68] hover:bg-[#E6E6FA] transition-colors cursor-pointer"
               title="Refresh messages"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-cinema-750 transition-colors"
+              className="p-2 rounded-lg text-[#483248] hover:text-[#9F2B68] hover:bg-[#E6E6FA] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -170,17 +170,17 @@ export const ChatDrawerModal = ({
         </div>
 
         {/* Message Thread */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-[#FAFAFE]">
           {loading && messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-slate-400 text-xs gap-2">
-              <RefreshCw className="w-4 h-4 animate-spin text-amber-400" />
+            <div className="h-full flex items-center justify-center text-[#AA98A9] text-xs gap-2">
+              <RefreshCw className="w-4 h-4 animate-spin text-[#9F2B68]" />
               Loading conversation history...
             </div>
           ) : messages.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-2">
-              <MessageSquare className="w-12 h-12 text-slate-600 mb-2" />
-              <h4 className="text-sm font-semibold text-white">Start the Conversation</h4>
-              <p className="text-xs text-slate-400 max-w-xs">
+              <MessageSquare className="w-12 h-12 text-[#CBC3E3] mb-2" />
+              <h4 className="text-sm font-semibold text-[#301934]">Start the Conversation</h4>
+              <p className="text-xs text-[#483248] max-w-xs font-medium">
                 Inquire about laser screen calibration, projection requirements, custom music, or
                 interval timing.
               </p>
@@ -193,7 +193,7 @@ export const ChatDrawerModal = ({
                   key={msg.id}
                   className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
                 >
-                  <span className="text-[10px] text-slate-500 mb-1 px-1">
+                  <span className="text-[10px] text-[#AA98A9] mb-1 px-1 font-mono">
                     {isMe ? 'You' : msg.sender_name || 'Staff'} •{' '}
                     {new Date(msg.created_at).toLocaleTimeString([], {
                       hour: '2-digit',
@@ -201,22 +201,22 @@ export const ChatDrawerModal = ({
                     })}
                   </span>
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed shadow-md ${
+                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs sm:text-sm leading-relaxed shadow-sm ${
                       isMe
-                        ? 'bg-gradient-to-r from-cinema-gold to-amber-500 text-cinema-950 font-medium rounded-br-none'
-                        : 'bg-cinema-800 text-slate-200 border border-cinema-700/80 rounded-bl-none'
+                        ? 'bg-gradient-to-r from-[#9F2B68] to-[#BF40BF] text-white font-medium rounded-br-none shadow-md shadow-[#9F2B68]/15'
+                        : 'bg-white text-[#301934] border border-[#CBC3E3] rounded-bl-none shadow-sm'
                     }`}
                   >
                     {msg.has_media && (
                       <div className="mb-2">
                         <div className="mb-1.5">
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/40 text-[10px] font-mono text-amber-300 border border-amber-500/25">
-                            <Lock className="w-2.5 h-2.5 text-amber-400" />
+                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-[#E6E6FA] text-[10px] font-mono text-[#702963] border border-[#CBC3E3]">
+                            <Lock className="w-2.5 h-2.5 text-[#9F2B68]" />
                             AES-256-GCM {msg.media_type === 'VIDEO' ? 'Encrypted Video' : 'Encrypted Media'}
                           </span>
                         </div>
                         {msg.media_type === 'VIDEO' ? (
-                          <div className="rounded-xl overflow-hidden bg-black border border-amber-500/20 shadow-md">
+                          <div className="rounded-xl overflow-hidden bg-black border border-[#CBC3E3] shadow-md">
                             <video
                               controls
                               preload="metadata"
@@ -225,7 +225,7 @@ export const ChatDrawerModal = ({
                             />
                           </div>
                         ) : (
-                          <div className="rounded-xl overflow-hidden border border-amber-500/20 shadow-md">
+                          <div className="rounded-xl overflow-hidden border border-[#CBC3E3] shadow-md">
                             <img
                               src={api.chat.getMediaUrl(msg.id)}
                               alt={msg.original_filename || 'Encrypted Media'}
@@ -246,21 +246,21 @@ export const ChatDrawerModal = ({
 
         {/* Selected Media Preview Chip */}
         {selectedMedia && (
-          <div className="px-4 py-2 border-t border-cinema-700/80 bg-cinema-900/90 flex items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 text-amber-300 truncate">
-              <FileVideo className="w-4 h-4 shrink-0 text-amber-400" />
+          <div className="px-4 py-2 border-t border-[#CBC3E3] bg-[#FFF0F7] flex items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2 text-[#9F2B68] truncate">
+              <FileVideo className="w-4 h-4 shrink-0 text-[#9F2B68]" />
               <span className="truncate font-medium">{selectedMedia.name}</span>
-              <span className="text-[10px] text-slate-400 font-mono">
+              <span className="text-[10px] text-[#AA98A9] font-mono">
                 ({(selectedMedia.size / (1024 * 1024)).toFixed(2)} MB)
               </span>
-              <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-semibold border border-emerald-500/30 flex items-center gap-1">
+              <span className="px-1.5 py-0.5 rounded bg-[#F8F5FF] text-[#5D3FD3] text-[10px] font-semibold border border-[#5D3FD3]/30 flex items-center gap-1">
                 <Lock className="w-2.5 h-2.5" /> Encrypted Video
               </span>
             </div>
             <button
               type="button"
               onClick={clearSelectedMedia}
-              className="p-1 rounded text-slate-400 hover:text-red-400 transition-colors"
+              className="p-1 rounded text-[#AA98A9] hover:text-[#800020] transition-colors cursor-pointer"
               title="Remove attachment"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -271,7 +271,7 @@ export const ChatDrawerModal = ({
         {/* Input Bar */}
         <form
           onSubmit={handleSend}
-          className="p-3 sm:p-4 border-t border-cinema-700/80 bg-cinema-850 flex items-center gap-2"
+          className="p-3 sm:p-4 border-t border-[#CBC3E3] bg-[#F8F6FC] flex items-center gap-2"
         >
           <input
             type="file"
@@ -283,8 +283,8 @@ export const ChatDrawerModal = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className={`p-2.5 rounded-xl border border-cinema-700 bg-cinema-900 hover:bg-cinema-800 text-amber-400 hover:text-amber-300 transition-colors ${
-              selectedMedia ? 'border-amber-400 bg-amber-500/10' : ''
+            className={`p-2.5 rounded-xl border border-[#CBC3E3] bg-white hover:bg-[#E6E6FA] text-[#9F2B68] transition-colors cursor-pointer ${
+              selectedMedia ? 'border-[#9F2B68] bg-[#FFF0F7]' : ''
             }`}
             title="Attach encrypted video or photo (MP4, WebM, JPG, PNG)"
           >
@@ -295,12 +295,12 @@ export const ChatDrawerModal = ({
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder={selectedMedia ? 'Add a caption for this encrypted video...' : 'Type your message...'}
-            className="flex-1 bg-cinema-900 border border-cinema-700 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+            className="flex-1 bg-white border border-[#CBC3E3] rounded-xl px-4 py-2.5 text-xs sm:text-sm text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68]"
           />
           <button
             type="submit"
             disabled={(!newMessage.trim() && !selectedMedia) || sending}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cinema-gold to-amber-400 hover:from-amber-400 hover:to-cinema-gold text-cinema-950 font-bold text-xs shadow-md shadow-cinema-gold/20 disabled:opacity-40 transition-all flex items-center gap-1.5"
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#9F2B68] via-[#BF40BF] to-[#5D3FD3] hover:opacity-95 text-white font-bold text-xs shadow-md shadow-[#9F2B68]/20 disabled:opacity-40 transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Send className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Send</span>

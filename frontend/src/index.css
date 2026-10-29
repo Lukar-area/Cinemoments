@@ -5,22 +5,249 @@
 @layer base {
   body {
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background-color: #FAFAFE;
+    color: #301934;
   }
 
   h1, h2, h3, .font-cinema {
     font-family: 'Cinzel', serif;
+    letter-spacing: -0.01em;
+    color: #301934;
+  }
+
+  .font-cinema-dec {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+  }
+
+  .font-marquee {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.08em;
   }
 }
 
-/* Custom Cinema Glows and Effects */
+/* ==========================================================================
+   LUMINOUS CINEMATIC AMBIANCE: WHITE + AMARANTH + ROYAL PURPLE PALETTE
+   ========================================================================== */
+
+/* Subtle 35mm Celluloid Texture Overlay in soft lavender-lilac */
+.film-grain {
+  position: relative;
+}
+.film-grain::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  z-index: 1;
+}
+
+/* Volumetric Projector Beam: Iris + Light Violet + Orchid cone on White/Alabaster */
+.projector-beam-cone {
+  background: radial-gradient(ellipse at 50% 0%, rgba(191, 64, 191, 0.22) 0%, rgba(93, 63, 211, 0.12) 35%, rgba(207, 159, 255, 0.08) 55%, transparent 80%);
+  clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+}
+
+.projector-beam-narrow {
+  background: linear-gradient(180deg, rgba(218, 112, 214, 0.35) 0%, rgba(159, 43, 104, 0.18) 30%, rgba(93, 63, 211, 0.08) 70%, transparent 100%);
+  clip-path: polygon(40% 0%, 60% 0%, 96% 100%, 4% 100%);
+}
+
+/* Anamorphic Lens Flare: Amaranth + Bright Purple + Iris streak */
+.anamorphic-flare {
+  position: relative;
+}
+.anamorphic-flare::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(159, 43, 104, 0.9) 30%, rgba(191, 64, 191, 1) 50%, rgba(93, 63, 211, 0.9) 70%, transparent 100%);
+  box-shadow: 0 0 25px 4px rgba(191, 64, 191, 0.6);
+  pointer-events: none;
+}
+
+/* Curved Silver Screen Effect (White / High-Contrast Theatrical Framing) */
+.silver-screen-curved {
+  position: relative;
+  border-radius: 16px 16px 28px 28px;
+  box-shadow: 
+    0 -15px 50px -10px rgba(159, 43, 104, 0.2),
+    0 20px 80px -15px rgba(93, 63, 211, 0.25),
+    0 4px 20px rgba(48, 25, 52, 0.15);
+  transform: perspective(1000px) rotateX(1deg);
+}
+
+.silver-screen-border {
+  border: 1px solid rgba(159, 43, 104, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 0 25px rgba(191, 64, 191, 0.2);
+}
+
+/* 35mm Celluloid Film Sprockets Border in Lavender / Mauve */
+.film-sprockets-left,
+.film-sprockets-right {
+  position: relative;
+}
+.film-sprockets-left::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 8px;
+  width: 14px;
+  background-image: radial-gradient(ellipse at center, #E6E6FA 45%, #AA98A9 50%, transparent 55%);
+  background-size: 14px 28px;
+  background-repeat: repeat-y;
+  opacity: 0.7;
+}
+
+.film-sprockets-horizontal {
+  background-image: radial-gradient(ellipse at center, #E6E6FA 45%, #AA98A9 50%, transparent 55%);
+  background-size: 28px 12px;
+  background-repeat: repeat-x;
+}
+
+/* Cinema Marquee Frame with Amaranth & Bright Purple Glow */
+.marquee-frame {
+  border: 2px solid #9F2B68;
+  box-shadow: 
+    0 0 0 1px #702963,
+    0 0 25px rgba(159, 43, 104, 0.35),
+    inset 0 0 15px rgba(191, 64, 191, 0.15);
+}
+
+/* Metallic & Gradient Typography */
+.gold-metallic-text,
+.amaranth-metallic-text {
+  background: linear-gradient(135deg, #9F2B68 0%, #BF40BF 40%, #DA70D6 75%, #5D3FD3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.royal-metallic-text {
+  background: linear-gradient(135deg, #301934 0%, #702963 45%, #9F2B68 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.silver-metallic-text {
+  background: linear-gradient(135deg, #483248 0%, #702963 50%, #AA98A9 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Ticket Stub Perforations (White card with crisp notches) */
+.ticket-edge-left {
+  position: relative;
+}
+.ticket-edge-left::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background-color: #FAFAFE;
+  border-radius: 50%;
+  box-shadow: inset -2px 0 3px rgba(159, 43, 104, 0.15);
+}
+
+.ticket-edge-right {
+  position: relative;
+}
+.ticket-edge-right::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -12px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  background-color: #FAFAFE;
+  border-radius: 50%;
+  box-shadow: inset 2px 0 3px rgba(159, 43, 104, 0.15);
+}
+
+.ticket-perforation-line {
+  background-image: repeating-linear-gradient(to bottom, #CBC3E3 0, #CBC3E3 8px, transparent 8px, transparent 16px);
+}
+
+/* Velvet Theatre Curtain Texture in Burgundy (#800020) & Mulberry (#770737) */
+.velvet-curtain {
+  background: repeating-linear-gradient(
+    90deg,
+    #5E0017 0px,
+    #800020 15px,
+    #9F2B68 30px,
+    #800020 45px,
+    #5E0017 60px
+  );
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.65);
+}
+
+/* Shimmer Button Sweep: Amaranth to Bright Purple with White Light Sweep */
+.btn-cinema-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-cinema-shimmer::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  animation: cinema-sweep 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cinema-sweep {
+  0% { left: -60%; }
+  30% { left: 160%; }
+  100% { left: 160%; }
+}
+
+/* Custom Cinema Scrollbar in Lavender & Amaranth */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F4F0FA;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBC3E3;
+  border-radius: 4px;
+  border: 1px solid #E6E6FA;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9F2B68;
+}
+
+/* Ambient Radial Cinema Lights for White + Amaranth Theme */
 .cinema-gradient {
-  background: radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.15) 0%, rgba(11, 15, 23, 0) 70%);
+  background: radial-gradient(circle at 50% 0%, rgba(159, 43, 104, 0.12) 0%, rgba(191, 64, 191, 0.06) 40%, rgba(250, 250, 254, 0) 80%);
 }
 
-.screen-glow {
-  box-shadow: 0 -20px 80px -10px rgba(56, 189, 248, 0.35), 0 0 30px rgba(245, 158, 11, 0.2);
+.cinema-card-ambient {
+  background: #FFFFFF;
+  border: 1px solid rgba(203, 195, 227, 0.7);
+  box-shadow: 0 10px 30px -8px rgba(48, 25, 52, 0.08), 0 2px 8px -2px rgba(93, 63, 211, 0.04);
 }
 
-.curtain-pattern {
-  background-image: repeating-linear-gradient(90deg, #0d121c 0px, #131b2a 20px, #0d121c 40px);
+.cinema-card-ambient:hover {
+  border-color: rgba(159, 43, 104, 0.5);
+  box-shadow: 0 16px 40px -10px rgba(159, 43, 104, 0.2), 0 0 20px rgba(191, 64, 191, 0.12);
 }

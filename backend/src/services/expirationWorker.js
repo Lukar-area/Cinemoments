@@ -5,6 +5,7 @@ import Screen from '../models/Screen.js';
 import Theatre from '../models/Theatre.js';
 import { createNotification } from './notificationService.js';
 import { recordAuditLog } from './auditService.js';
+import { isDBConnected } from '../db/database.js';
 
 let intervalTimer = null;
 
@@ -13,6 +14,7 @@ let intervalTimer = null;
  * or explicit expiration deadline has passed, and transitions them to EXPIRED.
  */
 export async function checkAndExpireRequests() {
+    if (!isDBConnected()) return;
     try {
         const now = new Date();
         const currentDateStr = now.toISOString().split('T')[0];

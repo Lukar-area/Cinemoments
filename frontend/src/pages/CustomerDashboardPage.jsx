@@ -145,35 +145,35 @@ export const CustomerDashboardPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-cinema-700/60">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#CBC3E3]">
         <div>
-          <span className="text-xs text-amber-400 font-bold uppercase tracking-widest">
-            Customer Dashboard
+          <span className="text-xs text-[#9F2B68] font-mono font-bold uppercase tracking-[0.25em]">
+            DIRECTOR CONSOLE
           </span>
-          <h1 className="font-cinema text-3xl sm:text-4xl font-bold text-white mt-1">
+          <h1 className="font-cinema text-3xl sm:text-4xl font-black text-[#301934] mt-1">
             Welcome back, {user?.name}
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Track your interval submissions, wallet balance, and communicate directly with cinemas.
+          <p className="text-sm text-[#5E435E] mt-1 font-medium">
+            Track your auditorium interval reservations, digital ticket passes, and direct communication with projection booths.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* Wallet card widget */}
-          <div className="px-4 py-2 rounded-2xl bg-gradient-to-r from-cinema-850 to-cinema-800 border border-amber-500/30 flex items-center gap-3 shadow-md">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-              <Wallet className="w-5 h-5" />
+          <div className="px-4 py-2.5 rounded-2xl bg-white border border-[#CBC3E3] flex items-center gap-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-[#E6E6FA] text-[#9F2B68] flex items-center justify-center border border-[#CBC3E3]">
+              <Wallet className="w-5 h-5 text-[#9F2B68]" />
             </div>
             <div>
-              <span className="text-[10px] text-slate-400 block font-semibold uppercase">Wallet Balance</span>
-              <span className="text-base font-black text-white">
+              <span className="text-[10px] text-[#AA98A9] block font-mono font-bold uppercase tracking-wider">Escrow Balance</span>
+              <span className="text-base font-mono font-black text-[#9F2B68]">
                 ₹{Number(user?.wallet_balance ?? 2000).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
               </span>
             </div>
             <button
               type="button"
               onClick={() => setShowWalletModal(true)}
-              className="ml-1 px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-xs font-bold flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+              className="ml-1 px-3 py-1.5 rounded-xl bg-[#9F2B68] hover:bg-[#BA3E7F] text-white text-xs font-mono font-bold flex items-center gap-1 transition-all cursor-pointer shadow-md"
               title="Add Funds"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -183,19 +183,19 @@ export const CustomerDashboardPage = () => {
 
           <Link
             to="/book"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cinema-gold to-amber-400 text-cinema-950 font-bold text-sm shadow-md shadow-cinema-gold/20 hover:from-amber-400 hover:to-cinema-gold transition-all"
+            className="btn-cinema-shimmer inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#9F2B68] via-[#BF40BF] to-[#5D3FD3] text-white font-mono font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#9F2B68]/20 transition-all"
           >
-            <Sparkles className="w-4 h-4 text-black" />
-            Book an Interval
+            <Sparkles className="w-4 h-4 text-white" />
+            Book Interval
           </Link>
         </div>
       </div>
 
       {/* Success Notification Banner */}
       {showSuccessBanner && (
-        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-between text-emerald-300 text-sm animate-in fade-in">
+        <div className="p-4 rounded-2xl bg-[#E6E6FA] border border-[#9F2B68]/40 flex items-center justify-between text-[#9F2B68] text-sm animate-in fade-in shadow-sm">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-[#9F2B68] shrink-0" />
             <span>
               <strong>Success!</strong> Your interval booking request has been submitted and is
               pending theatre review. ₹500 has been debited from your wallet.
@@ -203,7 +203,7 @@ export const CustomerDashboardPage = () => {
           </div>
           <button
             onClick={() => setShowSuccessBanner(false)}
-            className="text-xs font-semibold px-2 py-1 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200"
+            className="text-xs font-bold px-3 py-1 rounded-xl bg-white border border-[#CBC3E3] text-[#9F2B68]"
           >
             Dismiss
           </button>
@@ -212,56 +212,56 @@ export const CustomerDashboardPage = () => {
 
       {/* Overview Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-        <div className="p-5 rounded-2xl bg-cinema-850 border border-cinema-700/80 space-y-1">
-          <span className="text-xs text-slate-400 font-medium">Total Requests</span>
-          <span className="block text-2xl sm:text-3xl font-black text-white">{stats.total}</span>
+        <div className="p-5 rounded-2xl cinema-card-ambient space-y-1">
+          <span className="text-[11px] font-mono text-[#5E435E] uppercase tracking-wider font-bold">Total Bookings</span>
+          <span className="block text-2xl sm:text-3xl font-black text-[#301934] font-mono">{stats.total}</span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1">
-          <span className="text-xs text-amber-400 font-medium flex items-center gap-1">
-            <Clock className="w-3.5 h-3.5" /> Pending Review
+        <div className="p-5 rounded-2xl bg-[#FFF0F7] border border-[#AA336A]/30 space-y-1 shadow-sm">
+          <span className="text-[11px] font-mono text-[#9F2B68] uppercase tracking-wider flex items-center gap-1 font-bold">
+            <Clock className="w-3.5 h-3.5 text-[#9F2B68]" /> Under Review
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-amber-300">
+          <span className="block text-2xl sm:text-3xl font-black text-[#9F2B68] font-mono">
             {stats.pending}
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1">
-          <span className="text-xs text-emerald-400 font-medium flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5" /> Accepted
+        <div className="p-5 rounded-2xl bg-[#F8F5FF] border border-[#5D3FD3]/30 space-y-1 shadow-sm">
+          <span className="text-[11px] font-mono text-[#5D3FD3] uppercase tracking-wider flex items-center gap-1 font-bold">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#5D3FD3]" /> Confirmed
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-emerald-300">
+          <span className="block text-2xl sm:text-3xl font-black text-[#5D3FD3] font-mono">
             {stats.accepted}
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-1">
-          <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-500/60" /> Expired / Refunded
+        <div className="p-5 rounded-2xl bg-[#FFF0F4] border border-[#800020]/30 space-y-1 shadow-sm">
+          <span className="text-[11px] font-mono text-[#800020] uppercase tracking-wider flex items-center gap-1 font-bold">
+            <AlertTriangle className="w-3.5 h-3.5 text-[#800020]" /> Expired / Refunded
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-slate-300">
+          <span className="block text-2xl sm:text-3xl font-black text-[#800020] font-mono">
             {stats.expired}
           </span>
         </div>
 
-        <div className="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20 space-y-1 col-span-2 sm:col-span-1">
-          <span className="text-xs text-blue-400 font-medium flex items-center gap-1">
-            <CheckCheck className="w-3.5 h-3.5" /> Completed
+        <div className="p-5 rounded-2xl bg-[#FDF5FF] border border-[#BF40BF]/30 space-y-1 col-span-2 sm:col-span-1 shadow-sm">
+          <span className="text-[11px] font-mono text-[#BF40BF] uppercase tracking-wider flex items-center gap-1 font-bold">
+            <CheckCheck className="w-3.5 h-3.5 text-[#BF40BF]" /> Projected
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-blue-300">
+          <span className="block text-2xl sm:text-3xl font-black text-[#BF40BF] font-mono">
             {stats.completed}
           </span>
         </div>
       </div>
 
       {/* Tabs Switcher */}
-      <div className="flex items-center gap-3 border-b border-cinema-700/80 pb-2">
+      <div className="flex items-center gap-3 border-b border-[#CBC3E3] pb-2">
         <button
           onClick={() => setActiveTab('BOOKINGS')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
             activeTab === 'BOOKINGS'
-              ? 'bg-cinema-800 text-amber-400 border border-amber-500/30'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#9F2B68] text-white shadow-md shadow-[#9F2B68]/20'
+              : 'bg-white text-[#483248] hover:text-[#9F2B68] hover:bg-[#E6E6FA]/40 border border-[#CBC3E3]'
           }`}
         >
           <Film className="w-4 h-4" />
@@ -271,8 +271,8 @@ export const CustomerDashboardPage = () => {
           onClick={() => setActiveTab('TRANSACTIONS')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
             activeTab === 'TRANSACTIONS'
-              ? 'bg-cinema-800 text-amber-400 border border-amber-500/30'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#9F2B68] text-white shadow-md shadow-[#9F2B68]/20'
+              : 'bg-white text-[#483248] hover:text-[#9F2B68] hover:bg-[#E6E6FA]/40 border border-[#CBC3E3]'
           }`}
         >
           <Wallet className="w-4 h-4" />
@@ -286,19 +286,19 @@ export const CustomerDashboardPage = () => {
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-28 rounded-2xl bg-cinema-850 animate-pulse" />
+                <div key={i} className="h-28 rounded-2xl bg-white border border-[#CBC3E3] animate-pulse" />
               ))}
             </div>
           ) : bookings.length === 0 ? (
-            <div className="text-center py-20 rounded-3xl bg-cinema-850 border border-cinema-700/80 space-y-4">
-              <Film className="w-12 h-12 text-slate-500 mx-auto" />
-              <h3 className="text-lg font-bold text-white">No interval bookings yet</h3>
-              <p className="text-sm text-slate-400 max-w-sm mx-auto">
+            <div className="text-center py-20 rounded-3xl bg-white border border-[#CBC3E3] shadow-sm space-y-4">
+              <Film className="w-12 h-12 text-[#AA98A9] mx-auto" />
+              <h3 className="text-lg font-bold text-[#301934]">No interval bookings yet</h3>
+              <p className="text-sm text-[#483248] max-w-sm mx-auto">
                 You haven't requested any cinema intervals yet. Create your first unforgettable moment!
               </p>
               <Link
                 to="/book"
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-cinema-gold text-cinema-950 font-bold text-sm shadow-md"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-[#9F2B68] to-[#BF40BF] text-white font-bold text-sm shadow-md"
               >
                 Book an Interval Now
               </Link>
@@ -308,7 +308,7 @@ export const CustomerDashboardPage = () => {
               {bookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="p-5 rounded-2xl bg-cinema-850 border border-cinema-700/80 hover:border-amber-500/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6"
+                  className="p-6 rounded-3xl bg-white border border-[#CBC3E3] hover:border-[#9F2B68]/60 transition-all flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm hover:shadow-md relative overflow-hidden"
                 >
                   {/* Left: Movie & Status */}
                   <div className="flex items-start gap-4">
@@ -318,57 +318,57 @@ export const CustomerDashboardPage = () => {
                         'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200&q=80'
                       }
                       alt={booking.movie_title}
-                      className="w-16 h-24 object-cover rounded-xl shrink-0 shadow-md"
+                      className="w-16 h-24 object-cover rounded-2xl shrink-0 shadow-md border border-[#CBC3E3]"
                     />
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-semibold text-slate-400">
-                          #{booking.id.toString().padStart(4, '0')}
+                        <span className="text-[11px] font-mono font-bold text-[#9F2B68] bg-[#E6E6FA] px-2 py-0.5 rounded-md border border-[#CBC3E3]">
+                          PASS #{booking.id.toString().padStart(4, '0')}
                         </span>
                         <StatusBadge status={booking.status} size="sm" />
-                        <span className="text-[11px] px-2 py-0.5 rounded bg-cinema-800 text-amber-300 font-semibold uppercase">
+                        <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-[#FDF5FF] text-[#702963] border border-[#CBC3E3] uppercase">
                           {booking.booking_type.replace(/_/g, ' ')}
                         </span>
                       </div>
 
-                      <h3 className="text-base font-bold text-white">{booking.movie_title}</h3>
+                      <h3 className="text-lg font-bold text-[#301934] font-cinema">{booking.movie_title}</h3>
 
-                      <p className="text-xs text-slate-400 flex items-center gap-1.5">
-                        <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                      <p className="text-xs text-[#483248] flex items-center gap-1.5 font-medium">
+                        <Building2 className="w-3.5 h-3.5 text-[#9F2B68]" />
                         {booking.theatre_name} • {booking.screen_name}
                       </p>
 
-                      <p className="text-xs text-amber-200 italic line-clamp-1 max-w-md">
+                      <p className="text-xs text-[#702963] italic line-clamp-1 max-w-md font-serif bg-[#FDF5FF] px-2.5 py-1 rounded-lg border border-[#CBC3E3]/40">
                         "{booking.message}"
                       </p>
                     </div>
                   </div>
 
                   {/* Center: Timing Details */}
-                  <div className="text-xs text-slate-300 space-y-1 bg-cinema-900/60 p-3 rounded-xl border border-cinema-800">
+                  <div className="text-xs text-[#301934] space-y-1.5 bg-[#F8F6FC] p-3.5 rounded-2xl border border-[#CBC3E3] font-mono">
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-amber-400" />
+                      <Calendar className="w-3.5 h-3.5 text-[#9F2B68]" />
                       <span>
                         Show: {booking.show_date} • {booking.start_time}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-amber-400 font-semibold">
-                      <Clock className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1.5 text-[#9F2B68] font-bold">
+                      <Clock className="w-3.5 h-3.5 text-[#9F2B68]" />
                       <span>
                         Interval: {booking.interval_start} - {booking.interval_end}
                       </span>
                     </div>
-                    <div className="text-[10px] text-slate-500 pt-0.5">
-                      Submitted: {new Date(booking.created_at).toLocaleDateString()}
+                    <div className="text-[10px] text-[#AA98A9] pt-0.5">
+                      Directed: {new Date(booking.created_at).toLocaleDateString()}
                     </div>
                   </div>
 
                   {/* Right: Actions */}
-                  <div className="flex items-center justify-end gap-2.5 pt-3 md:pt-0 border-t md:border-t-0 border-cinema-800 flex-wrap">
+                  <div className="flex items-center justify-end gap-2.5 pt-3 md:pt-0 border-t md:border-t-0 border-[#CBC3E3] flex-wrap">
                     {/* Live Chat with Theatre Button */}
                     <button
                       onClick={() => openChat(booking.theatre_id, booking.theatre_name, booking.id)}
-                      className="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                      className="px-3 py-2 rounded-xl bg-[#E6E6FA] hover:bg-[#CBC3E3] text-[#702963] border border-[#CBC3E3] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                       title="Chat with Theatre"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
@@ -383,7 +383,7 @@ export const CustomerDashboardPage = () => {
                             type: booking.media_type || 'IMAGE',
                           })
                         }
-                        className="p-2 rounded-xl bg-cinema-800 hover:bg-cinema-700 text-amber-400 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        className="p-2 rounded-xl bg-white hover:bg-[#E6E6FA] text-[#5D3FD3] border border-[#CBC3E3] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                         title="Preview Media"
                       >
                         <Eye className="w-4 h-4" />
@@ -393,24 +393,24 @@ export const CustomerDashboardPage = () => {
 
                     <button
                       onClick={() => setSelectedBooking(booking)}
-                      className="px-3.5 py-2 rounded-xl bg-cinema-800 hover:bg-cinema-750 text-slate-200 text-xs font-semibold transition-colors"
+                      className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#E6E6FA] text-[#301934] border border-[#CBC3E3] text-xs font-semibold transition-colors cursor-pointer"
                     >
                       Details
                     </button>
 
                     <button
                       onClick={() => openReceiptForBooking(booking)}
-                      className="px-3 py-2 rounded-xl bg-cinema-800 hover:bg-cinema-750 text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5 border border-cinema-750"
+                      className="px-3 py-2 rounded-xl bg-white hover:bg-[#E6E6FA] text-[#9F2B68] border border-[#CBC3E3] text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
                       title="View Digital Receipt"
                     >
-                      <Receipt className="w-3.5 h-3.5 text-amber-400" />
+                      <Receipt className="w-3.5 h-3.5 text-[#9F2B68]" />
                       Receipt
                     </button>
 
                     {(booking.status === 'PENDING' || booking.status === 'UNDER_REVIEW') && (
                       <button
                         onClick={() => setCancellingBookingId(booking.id)}
-                        className="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-semibold transition-colors flex items-center gap-1"
+                        className="px-3 py-2 rounded-xl bg-[#FFF0F4] hover:bg-[#FFE0E9] text-[#800020] border border-[#800020]/30 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <Ban className="w-3.5 h-3.5" /> Cancel (Refund)
                       </button>
@@ -426,24 +426,24 @@ export const CustomerDashboardPage = () => {
       {/* TAB 2: Wallet Transactions List */}
       {activeTab === 'TRANSACTIONS' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-cinema-850 border border-cinema-700/80 space-y-4">
-            <h3 className="font-cinema text-lg font-bold text-white flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-amber-400" />
+          <div className="p-6 rounded-3xl bg-white border border-[#CBC3E3] shadow-sm space-y-4">
+            <h3 className="font-cinema text-lg font-bold text-[#301934] flex items-center gap-2">
+              <Wallet className="w-5 h-5 text-[#9F2B68]" />
               Wallet & Escrow Activity
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#483248]">
               When you submit a booking, ₹500 is debited into theatre escrow. If cancelled,
               rejected, or expired, 100% of the funds are immediately refunded to your wallet.
             </p>
 
             {transactions.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 text-sm">
+              <div className="py-12 text-center text-[#AA98A9] text-sm">
                 No wallet transactions recorded yet.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-cinema-900/60 text-slate-400 uppercase tracking-wider border-b border-cinema-750">
+                  <thead className="bg-[#F8F6FC] text-[#483248] uppercase tracking-wider border-b border-[#CBC3E3]">
                     <tr>
                       <th className="p-3">Tx ID</th>
                       <th className="p-3">Booking</th>
@@ -454,30 +454,30 @@ export const CustomerDashboardPage = () => {
                       <th className="p-3">Date</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-cinema-750/50">
+                  <tbody className="divide-y divide-[#CBC3E3]/50">
                     {transactions.map((tx) => (
-                      <tr key={tx.id} className="hover:bg-cinema-800/40 transition-colors">
-                        <td className="p-3 font-mono text-slate-400">#{tx.id}</td>
-                        <td className="p-3 font-semibold text-white">Booking #{tx.booking_id}</td>
-                        <td className="p-3 text-slate-300">{tx.theatre_name || 'Cinema'}</td>
-                        <td className="p-3 text-slate-300">
+                      <tr key={tx.id} className="hover:bg-[#FDF5FF] transition-colors">
+                        <td className="p-3 font-mono text-[#5D3FD3]">#{tx.id}</td>
+                        <td className="p-3 font-semibold text-[#301934]">Booking #{tx.booking_id}</td>
+                        <td className="p-3 text-[#483248]">{tx.theatre_name || 'Cinema'}</td>
+                        <td className="p-3 text-[#483248]">
                           {tx.movie_title} {tx.show_date ? `(${tx.show_date})` : ''}
                         </td>
-                        <td className="p-3 font-bold text-amber-300">
+                        <td className="p-3 font-bold font-mono text-[#9F2B68]">
                           ₹{Number(tx.total_amount).toFixed(2)}
                         </td>
                         <td className="p-3">
                           {tx.status === 'COMPLETED' ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[11px] font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FFF0F7] text-[#9F2B68] border border-[#9F2B68]/30 text-[11px] font-semibold">
                               <ArrowUpRight className="w-3 h-3" /> Debited
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[11px] font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F8F5FF] text-[#5D3FD3] border border-[#5D3FD3]/30 text-[11px] font-semibold">
                               <ArrowDownLeft className="w-3 h-3" /> 100% Refunded
                             </span>
                           )}
                         </td>
-                        <td className="p-3 text-slate-500">
+                        <td className="p-3 text-[#AA98A9]">
                           {new Date(tx.created_at).toLocaleString()}
                         </td>
                       </tr>
@@ -492,14 +492,14 @@ export const CustomerDashboardPage = () => {
 
       {/* Booking Details Modal */}
       {selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-2xl rounded-3xl bg-cinema-850 border border-cinema-700 shadow-2xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between pb-4 border-b border-cinema-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-2xl rounded-3xl bg-white border-2 border-[#CBC3E3] shadow-2xl p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between pb-4 border-b border-[#CBC3E3]">
               <div>
-                <span className="text-xs text-amber-400 font-bold uppercase">
+                <span className="text-xs text-[#9F2B68] font-bold uppercase font-mono">
                   Booking Reference #{selectedBooking.id.toString().padStart(4, '0')}
                 </span>
-                <h2 className="text-2xl font-bold text-white mt-1">
+                <h2 className="text-2xl font-bold text-[#301934] font-cinema mt-1">
                   {selectedBooking.movie_title}
                 </h2>
                 <div className="mt-2">
@@ -508,33 +508,33 @@ export const CustomerDashboardPage = () => {
               </div>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-cinema-800"
+                className="p-1.5 rounded-lg text-[#483248] hover:text-[#9F2B68] bg-[#E6E6FA] cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs">
-              <div className="p-3 rounded-xl bg-cinema-900 border border-cinema-800">
-                <span className="text-slate-400 block">Theatre & Screen</span>
-                <span className="font-bold text-white mt-1 block">
+              <div className="p-3 rounded-xl bg-[#F8F6FC] border border-[#CBC3E3]">
+                <span className="text-[#AA98A9] block font-mono">Theatre & Screen</span>
+                <span className="font-bold text-[#301934] mt-1 block">
                   {selectedBooking.theatre_name} • {selectedBooking.screen_name}
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-cinema-900 border border-cinema-800">
-                <span className="text-slate-400 block">Interval Intermission</span>
-                <span className="font-bold text-amber-400 mt-1 block">
+              <div className="p-3 rounded-xl bg-[#F8F6FC] border border-[#CBC3E3]">
+                <span className="text-[#AA98A9] block font-mono">Interval Intermission</span>
+                <span className="font-bold text-[#9F2B68] mt-1 block font-mono">
                   {selectedBooking.interval_start} – {selectedBooking.interval_end}
                 </span>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-cinema-900 border border-cinema-800 space-y-2">
-              <span className="text-xs text-slate-400 block font-semibold">Your Screen Message:</span>
-              <p className="text-sm text-amber-200 italic font-medium">"{selectedBooking.message}"</p>
+            <div className="p-4 rounded-xl bg-[#FFF0F7] border border-[#AA336A]/20 space-y-2">
+              <span className="text-xs text-[#AA336A] block font-semibold">Your Screen Message:</span>
+              <p className="text-sm text-[#702963] italic font-serif">"{selectedBooking.message}"</p>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-cinema-700">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-[#CBC3E3]">
               <button
                 onClick={() => {
                   setSelectedBooking(null);
@@ -544,13 +544,13 @@ export const CustomerDashboardPage = () => {
                     selectedBooking.id
                   );
                 }}
-                className="px-4 py-2.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-xl bg-[#E6E6FA] hover:bg-[#CBC3E3] text-[#702963] border border-[#CBC3E3] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               >
                 <MessageSquare className="w-4 h-4" /> Message Cinema Staff
               </button>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="px-5 py-2.5 rounded-xl bg-cinema-800 text-white text-xs font-semibold hover:bg-cinema-750"
+                className="px-5 py-2.5 rounded-xl bg-[#301934] text-white text-xs font-semibold hover:bg-[#483248] cursor-pointer"
               >
                 Close
               </button>

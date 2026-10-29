@@ -146,29 +146,29 @@ export const StaffDashboardPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       {/* Header */}
-      <div className="pb-6 border-b border-cinema-700/60 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="pb-6 border-b border-[#CBC3E3] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <span className="text-xs text-amber-400 font-bold uppercase tracking-widest">
-            Theatre Operations Portal
+          <span className="text-xs text-[#9F2B68] font-mono font-bold uppercase tracking-[0.25em]">
+            PROJECTION BOOTH OPERATIONS
           </span>
-          <h1 className="font-cinema text-3xl sm:text-4xl font-bold text-white mt-1">
-            Interval Operations & Revenue Hub
+          <h1 className="font-cinema text-3xl sm:text-4xl font-black text-[#301934] mt-1">
+            Auditorium Playout & Intermission Dispatch
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Review interval requests, chat with patrons, and track your cinema's 80% revenue share.
+          <p className="text-sm text-[#483248] mt-1 font-medium">
+            Review interval submissions, chat with patrons, and verify 4K cinema projection playouts.
           </p>
         </div>
 
         {/* 80% Earnings Header Card */}
-        <div className="px-5 py-3 rounded-2xl bg-cinema-850 border border-amber-500/30 flex items-center gap-4 shadow-lg">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-            <TrendingUp className="w-5 h-5" />
+        <div className="px-5 py-3 rounded-2xl bg-white border border-[#CBC3E3] flex items-center gap-4 shadow-sm">
+          <div className="w-10 h-10 rounded-xl bg-[#E6E6FA] text-[#9F2B68] flex items-center justify-center font-bold border border-[#CBC3E3]">
+            <TrendingUp className="w-5 h-5 text-[#9F2B68]" />
           </div>
           <div>
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">
-              80% Theatre Revenue Earned
+            <span className="text-[10px] text-[#AA98A9] font-mono uppercase font-bold tracking-wider block">
+              80% Theatre Revenue Share
             </span>
-            <span className="text-xl font-black text-amber-300">
+            <span className="text-xl font-black text-[#9F2B68] font-mono">
               ₹{Number(earnings.summary?.total_earnings || 0).toFixed(2)}
             </span>
           </div>
@@ -177,14 +177,14 @@ export const StaffDashboardPage = () => {
 
       {/* Action Success Alert */}
       {actionSuccessNotice && (
-        <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-sm flex items-center justify-between animate-in fade-in">
+        <div className="p-4 rounded-2xl bg-[#FFF0F7] border border-[#9F2B68]/30 text-[#9F2B68] text-sm flex items-center justify-between animate-in fade-in shadow-sm font-medium">
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+            <CheckCircle2 className="w-5 h-5 text-[#9F2B68] shrink-0" />
             <span>{actionSuccessNotice}</span>
           </div>
           <button
             onClick={() => setActionSuccessNotice(null)}
-            className="text-xs font-semibold px-2 py-1 rounded bg-emerald-500/20 text-emerald-200"
+            className="text-xs font-semibold px-2 py-1 rounded-lg bg-white border border-[#CBC3E3] text-[#9F2B68] cursor-pointer"
           >
             Dismiss
           </button>
@@ -200,14 +200,14 @@ export const StaffDashboardPage = () => {
           }}
           className={`cursor-pointer p-5 rounded-2xl border transition-all ${
             statusFilter === 'PENDING' && activeTab === 'QUEUE'
-              ? 'bg-amber-500/15 border-amber-400 shadow-glow-gold'
-              : 'bg-cinema-850 border-cinema-700/80 hover:border-slate-600'
+              ? 'bg-[#FFF0F7] border-2 border-[#9F2B68] shadow-md shadow-[#9F2B68]/10'
+              : 'bg-white border-[#CBC3E3] hover:border-[#9F2B68]/50 shadow-sm'
           }`}
         >
-          <span className="text-xs text-amber-400 font-semibold flex items-center gap-1">
+          <span className="text-xs text-[#9F2B68] font-semibold flex items-center gap-1 font-mono">
             <Clock className="w-3.5 h-3.5" /> Pending Requests
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-amber-300 mt-1">
+          <span className="block text-2xl sm:text-3xl font-black text-[#9F2B68] mt-1 font-mono">
             {cards.pendingRequests}
           </span>
         </div>
@@ -219,14 +219,14 @@ export const StaffDashboardPage = () => {
           }}
           className={`cursor-pointer p-5 rounded-2xl border transition-all ${
             statusFilter === 'ACCEPTED' && activeTab === 'QUEUE'
-              ? 'bg-emerald-500/15 border-emerald-400 shadow-sm'
-              : 'bg-cinema-850 border-cinema-700/80 hover:border-slate-600'
+              ? 'bg-[#F8F5FF] border-2 border-[#5D3FD3] shadow-md shadow-[#5D3FD3]/10'
+              : 'bg-white border-[#CBC3E3] hover:border-[#5D3FD3]/50 shadow-sm'
           }`}
         >
-          <span className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+          <span className="text-xs text-[#5D3FD3] font-semibold flex items-center gap-1 font-mono">
             <CheckCircle2 className="w-3.5 h-3.5" /> Accepted Bookings
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-emerald-300 mt-1">
+          <span className="block text-2xl sm:text-3xl font-black text-[#5D3FD3] mt-1 font-mono">
             {cards.todayAcceptedBookings + cards.upcomingIntervalBookings}
           </span>
         </div>
@@ -235,14 +235,14 @@ export const StaffDashboardPage = () => {
           onClick={() => setActiveTab('CHATS')}
           className={`cursor-pointer p-5 rounded-2xl border transition-all ${
             activeTab === 'CHATS'
-              ? 'bg-blue-500/15 border-blue-400 shadow-sm'
-              : 'bg-cinema-850 border-cinema-700/80 hover:border-slate-600'
+              ? 'bg-[#FDF5FF] border-2 border-[#BF40BF] shadow-md shadow-[#BF40BF]/10'
+              : 'bg-white border-[#CBC3E3] hover:border-[#BF40BF]/50 shadow-sm'
           }`}
         >
-          <span className="text-xs text-blue-400 font-semibold flex items-center gap-1">
+          <span className="text-xs text-[#BF40BF] font-semibold flex items-center gap-1 font-mono">
             <MessageSquare className="w-3.5 h-3.5" /> Customer Inquiries
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-blue-300 mt-1">
+          <span className="block text-2xl sm:text-3xl font-black text-[#BF40BF] mt-1 font-mono">
             {conversations.length}
           </span>
         </div>
@@ -251,47 +251,47 @@ export const StaffDashboardPage = () => {
           onClick={() => setActiveTab('EARNINGS')}
           className={`cursor-pointer p-5 rounded-2xl border transition-all ${
             activeTab === 'EARNINGS'
-              ? 'bg-amber-500/15 border-amber-400 shadow-sm'
-              : 'bg-cinema-850 border-cinema-700/80 hover:border-slate-600'
+              ? 'bg-[#FFF0F4] border-2 border-[#800020] shadow-md shadow-[#800020]/10'
+              : 'bg-white border-[#CBC3E3] hover:border-[#800020]/50 shadow-sm'
           }`}
         >
-          <span className="text-xs text-amber-400 font-semibold flex items-center gap-1">
+          <span className="text-xs text-[#800020] font-semibold flex items-center gap-1 font-mono">
             <DollarSign className="w-3.5 h-3.5" /> Paid Interval Slots
           </span>
-          <span className="block text-2xl sm:text-3xl font-black text-amber-300 mt-1">
+          <span className="block text-2xl sm:text-3xl font-black text-[#800020] mt-1 font-mono">
             {earnings.summary?.completed_count || 0}
           </span>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-3 border-b border-cinema-700/80 pb-2">
+      <div className="flex items-center gap-3 border-b border-[#CBC3E3] pb-2">
         <button
           onClick={() => setActiveTab('QUEUE')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
             activeTab === 'QUEUE'
-              ? 'bg-cinema-800 text-amber-400 border border-amber-500/30'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#9F2B68] text-white shadow-md shadow-[#9F2B68]/20'
+              : 'bg-white text-[#483248] border border-[#CBC3E3] hover:text-[#9F2B68]'
           }`}
         >
           Review Queue ({bookings.length})
         </button>
         <button
           onClick={() => setActiveTab('CHATS')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
             activeTab === 'CHATS'
-              ? 'bg-cinema-800 text-amber-400 border border-amber-500/30'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#9F2B68] text-white shadow-md shadow-[#9F2B68]/20'
+              : 'bg-white text-[#483248] border border-[#CBC3E3] hover:text-[#9F2B68]'
           }`}
         >
           Customer Chats ({conversations.length})
         </button>
         <button
           onClick={() => setActiveTab('EARNINGS')}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all cursor-pointer ${
             activeTab === 'EARNINGS'
-              ? 'bg-cinema-800 text-amber-400 border border-amber-500/30'
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-[#9F2B68] text-white shadow-md shadow-[#9F2B68]/20'
+              : 'bg-white text-[#483248] border border-[#CBC3E3] hover:text-[#9F2B68]'
           }`}
         >
           80% Revenue Share Payouts
@@ -304,13 +304,13 @@ export const StaffDashboardPage = () => {
           {/* Controls: Search and Status Filter */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div className="relative flex-1 max-w-md">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-[#AA98A9] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by customer, movie, or message..."
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-cinema-850 border border-cinema-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-[#CBC3E3] text-sm text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68]"
               />
             </div>
 
@@ -319,10 +319,10 @@ export const StaffDashboardPage = () => {
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                     statusFilter === s
-                      ? 'bg-amber-400 text-cinema-950 font-bold'
-                      : 'bg-cinema-850 text-slate-400 hover:text-white border border-cinema-700'
+                      ? 'bg-[#9F2B68] text-white font-bold'
+                      : 'bg-white text-[#483248] hover:text-[#9F2B68] border border-[#CBC3E3]'
                   }`}
                 >
                   {s}
@@ -335,14 +335,14 @@ export const StaffDashboardPage = () => {
           {loading ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 rounded-2xl bg-cinema-850 animate-pulse" />
+                <div key={i} className="h-32 rounded-2xl bg-white border border-[#CBC3E3] animate-pulse" />
               ))}
             </div>
           ) : filteredBookings.length === 0 ? (
-            <div className="py-20 text-center rounded-3xl bg-cinema-850 border border-cinema-700/80 space-y-3">
-              <Film className="w-12 h-12 text-slate-500 mx-auto" />
-              <h3 className="text-base font-bold text-white">No requests in this category</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="py-20 text-center rounded-3xl bg-white border border-[#CBC3E3] shadow-sm space-y-3">
+              <Film className="w-12 h-12 text-[#AA98A9] mx-auto" />
+              <h3 className="text-base font-bold text-[#301934]">No requests in this category</h3>
+              <p className="text-xs text-[#483248] max-w-sm mx-auto">
                 No interval requests match the selected filter. Try selecting "ALL" or check back
                 when customers submit proposals.
               </p>
@@ -352,7 +352,7 @@ export const StaffDashboardPage = () => {
               {filteredBookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="p-6 rounded-2xl bg-cinema-850 border border-cinema-700/80 hover:border-amber-500/40 transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+                  className="p-6 rounded-2xl bg-white border border-[#CBC3E3] hover:border-[#9F2B68]/50 shadow-sm transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-6"
                 >
                   {/* Left: Proposal Content */}
                   <div className="flex items-start gap-4">
@@ -362,45 +362,45 @@ export const StaffDashboardPage = () => {
                         'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200&q=80'
                       }
                       alt={booking.movie_title}
-                      className="w-16 h-24 object-cover rounded-xl shrink-0 shadow-md"
+                      className="w-16 h-24 object-cover rounded-xl shrink-0 shadow-md border border-[#CBC3E3]"
                     />
 
                     <div className="space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-bold text-amber-400">
+                        <span className="text-xs font-bold font-mono text-[#9F2B68] bg-[#E6E6FA] px-2 py-0.5 rounded border border-[#CBC3E3]">
                           #{booking.id.toString().padStart(4, '0')}
                         </span>
                         <StatusBadge status={booking.status} size="sm" />
-                        <span className="text-[11px] px-2 py-0.5 rounded bg-cinema-800 text-slate-300 font-semibold uppercase">
+                        <span className="text-[11px] px-2 py-0.5 rounded bg-[#FDF5FF] text-[#702963] font-semibold uppercase border border-[#CBC3E3]">
                           {booking.booking_type.replace(/_/g, ' ')}
                         </span>
                       </div>
 
-                      <h3 className="text-base font-bold text-white">{booking.movie_title}</h3>
+                      <h3 className="text-base font-bold text-[#301934] font-cinema">{booking.movie_title}</h3>
 
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-[#483248]">
                         Requested by:{' '}
-                        <strong className="text-white">{booking.customer_name}</strong> (
+                        <strong className="text-[#301934]">{booking.customer_name}</strong> (
                         {booking.customer_email}
                         {booking.contact_phone ? ` • ${booking.contact_phone}` : ''})
                       </p>
 
-                      <p className="text-xs text-amber-200 italic line-clamp-2 max-w-xl">
+                      <p className="text-xs text-[#702963] italic line-clamp-2 max-w-xl font-serif bg-[#FDF5FF] p-2 rounded-lg border border-[#CBC3E3]/40">
                         "{booking.message}"
                       </p>
                     </div>
                   </div>
 
                   {/* Center: Timing Details */}
-                  <div className="p-3 rounded-xl bg-cinema-900 border border-cinema-800 text-xs text-slate-300 space-y-1 min-w-[200px]">
+                  <div className="p-3.5 rounded-xl bg-[#F8F6FC] border border-[#CBC3E3] text-xs text-[#301934] space-y-1 min-w-[200px] font-mono">
                     <div>
-                      Screen: <strong className="text-white">{booking.screen_name}</strong>
+                      Screen: <strong className="text-[#301934]">{booking.screen_name}</strong>
                     </div>
                     <div>
-                      Show Date: <strong className="text-white">{booking.show_date}</strong> •{' '}
+                      Show Date: <strong className="text-[#301934]">{booking.show_date}</strong> •{' '}
                       {booking.start_time}
                     </div>
-                    <div className="text-amber-400 font-semibold">
+                    <div className="text-[#9F2B68] font-bold">
                       Interval: {booking.interval_start} - {booking.interval_end}
                     </div>
                   </div>
@@ -416,7 +416,7 @@ export const StaffDashboardPage = () => {
                           booking.id
                         )
                       }
-                      className="px-3 py-2 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center gap-1.5"
+                      className="px-3 py-2 rounded-xl bg-[#E6E6FA] hover:bg-[#CBC3E3] text-[#702963] border border-[#CBC3E3] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                     >
                       <MessageSquare className="w-3.5 h-3.5" />
                       Chat with Customer
@@ -430,7 +430,7 @@ export const StaffDashboardPage = () => {
                             type: booking.media_type || 'IMAGE',
                           })
                         }
-                        className="p-2 rounded-xl bg-cinema-800 hover:bg-cinema-750 text-amber-400 text-xs font-semibold flex items-center gap-1.5"
+                        className="p-2 rounded-xl bg-white hover:bg-[#E6E6FA] text-[#5D3FD3] border border-[#CBC3E3] text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
                         title="Preview Media"
                       >
                         <Eye className="w-4 h-4" />
@@ -442,13 +442,13 @@ export const StaffDashboardPage = () => {
                       <>
                         <button
                           onClick={() => setAcceptingBooking(booking)}
-                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white text-xs font-bold shadow-md shadow-emerald-500/20 flex items-center gap-1.5"
+                          className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#9F2B68] to-[#BF40BF] text-white text-xs font-bold shadow-md shadow-[#9F2B68]/20 flex items-center gap-1.5 cursor-pointer"
                         >
                           <Check className="w-3.5 h-3.5" /> Accept
                         </button>
                         <button
                           onClick={() => setRejectingBooking(booking)}
-                          className="px-3.5 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold flex items-center gap-1.5"
+                          className="px-3.5 py-2 rounded-xl bg-[#FFF0F4] hover:bg-[#FFE0E9] text-[#800020] border border-[#800020]/30 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" /> Reject
                         </button>
@@ -465,36 +465,36 @@ export const StaffDashboardPage = () => {
       {/* TAB 2: Customer Inquiries & Chats */}
       {activeTab === 'CHATS' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-cinema-850 border border-cinema-700/80 space-y-4">
-            <h3 className="font-cinema text-lg font-bold text-white flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-400" />
+          <div className="p-6 rounded-3xl bg-white border border-[#CBC3E3] shadow-sm space-y-4">
+            <h3 className="font-cinema text-lg font-bold text-[#301934] flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-[#9F2B68]" />
               Direct Customer Conversations
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#483248]">
               Patrons submitting interval bookings or inquiring about projection requirements.
             </p>
 
             {conversations.length === 0 ? (
-              <div className="py-16 text-center text-slate-400 text-sm">
+              <div className="py-16 text-center text-[#AA98A9] text-sm">
                 No active conversations yet.
               </div>
             ) : (
-              <div className="divide-y divide-cinema-750">
+              <div className="divide-y divide-[#CBC3E3]/50">
                 {conversations.map((conv) => (
                   <div
                     key={conv.user_id}
                     onClick={() =>
                       openCustomerChat(conv.theatre_id, conv.user_id, conv.user_name)
                     }
-                    className="p-4 hover:bg-cinema-800/40 transition-colors cursor-pointer flex items-center justify-between rounded-xl"
+                    className="p-4 hover:bg-[#FDF5FF] transition-colors cursor-pointer flex items-center justify-between rounded-xl"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-full bg-[#E6E6FA] text-[#9F2B68] flex items-center justify-center font-bold border border-[#CBC3E3]">
                         <User className="w-5 h-5" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-white">{conv.user_name}</h4>
-                        <p className="text-xs text-slate-400 line-clamp-1">
+                        <h4 className="text-sm font-bold text-[#301934]">{conv.user_name}</h4>
+                        <p className="text-xs text-[#483248] line-clamp-1">
                           {conv.last_message || 'Start chatting with this patron...'}
                         </p>
                       </div>
@@ -502,11 +502,11 @@ export const StaffDashboardPage = () => {
 
                     <div className="flex items-center gap-3 text-xs">
                       {conv.unread_count > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-blue-500 text-white font-bold text-[10px]">
+                        <span className="px-2 py-0.5 rounded-full bg-[#9F2B68] text-white font-bold text-[10px]">
                           {conv.unread_count} new
                         </span>
                       )}
-                      <button className="px-3.5 py-1.5 rounded-lg bg-cinema-800 hover:bg-cinema-750 text-slate-300 font-semibold text-xs">
+                      <button className="px-3.5 py-1.5 rounded-lg bg-white border border-[#CBC3E3] text-[#301934] font-semibold text-xs hover:bg-[#E6E6FA]">
                         Open Chat
                       </button>
                     </div>
@@ -521,24 +521,24 @@ export const StaffDashboardPage = () => {
       {/* TAB 3: 80% Revenue Share Payouts */}
       {activeTab === 'EARNINGS' && (
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-cinema-850 border border-cinema-700/80 space-y-4">
-            <h3 className="font-cinema text-lg font-bold text-white flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-amber-400" />
+          <div className="p-6 rounded-3xl bg-white border border-[#CBC3E3] shadow-sm space-y-4">
+            <h3 className="font-cinema text-lg font-bold text-[#301934] flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-[#9F2B68]" />
               80% Theatre Revenue Breakdown
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#483248]">
               For every ₹500 interval screening booked and completed at your theatre, 80% (₹400.00)
               is credited to your cinema revenue balance. 20% (₹100.00) is deducted as platform super-admin commission.
             </p>
 
             {earnings.transactions?.length === 0 ? (
-              <div className="py-16 text-center text-slate-400 text-sm">
+              <div className="py-16 text-center text-[#AA98A9] text-sm">
                 No revenue transactions recorded yet.
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-cinema-900/60 text-slate-400 uppercase tracking-wider border-b border-cinema-750">
+                  <thead className="bg-[#F8F6FC] text-[#483248] uppercase tracking-wider border-b border-[#CBC3E3]">
                     <tr>
                       <th className="p-3">Tx ID</th>
                       <th className="p-3">Booking ID</th>
@@ -550,29 +550,29 @@ export const StaffDashboardPage = () => {
                       <th className="p-3">Date</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-cinema-750/50">
+                  <tbody className="divide-y divide-[#CBC3E3]/50">
                     {earnings.transactions?.map((tx) => (
-                      <tr key={tx.id} className="hover:bg-cinema-800/40 transition-colors">
-                        <td className="p-3 font-mono text-slate-400">#{tx.id}</td>
-                        <td className="p-3 font-semibold text-white">#{tx.booking_id}</td>
-                        <td className="p-3 text-slate-300">{tx.customer_name || 'Customer'}</td>
-                        <td className="p-3 font-mono text-slate-400">₹{Number(tx.total_amount).toFixed(2)}</td>
-                        <td className="p-3 font-bold text-amber-400">
+                      <tr key={tx.id} className="hover:bg-[#FDF5FF] transition-colors">
+                        <td className="p-3 font-mono text-[#5D3FD3]">#{tx.id}</td>
+                        <td className="p-3 font-semibold text-[#301934]">#{tx.booking_id}</td>
+                        <td className="p-3 text-[#483248]">{tx.customer_name || 'Customer'}</td>
+                        <td className="p-3 font-mono text-[#483248]">₹{Number(tx.total_amount).toFixed(2)}</td>
+                        <td className="p-3 font-bold font-mono text-[#9F2B68]">
                           ₹{Number(tx.theatre_share).toFixed(2)}
                         </td>
-                        <td className="p-3 text-slate-500">₹{Number(tx.admin_share).toFixed(2)}</td>
+                        <td className="p-3 text-[#AA98A9]">₹{Number(tx.admin_share).toFixed(2)}</td>
                         <td className="p-3">
                           {tx.status === 'COMPLETED' ? (
-                            <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[11px] font-bold">
+                            <span className="px-2 py-0.5 rounded bg-[#FFF0F7] text-[#9F2B68] border border-[#9F2B68]/30 text-[11px] font-bold">
                               COMPLETED
                             </span>
                           ) : (
-                            <span className="px-2 py-0.5 rounded bg-red-500/10 text-red-400 text-[11px] font-bold">
+                            <span className="px-2 py-0.5 rounded bg-[#FFF0F4] text-[#800020] border border-[#800020]/30 text-[11px] font-bold">
                               REFUNDED
                             </span>
                           )}
                         </td>
-                        <td className="p-3 text-slate-500">
+                        <td className="p-3 text-[#AA98A9]">
                           {new Date(tx.created_at).toLocaleDateString()}
                         </td>
                       </tr>
@@ -599,10 +599,10 @@ export const StaffDashboardPage = () => {
 
       {/* Reject Modal */}
       {rejectingBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-md rounded-2xl bg-cinema-850 border border-cinema-700 shadow-2xl p-6 space-y-4">
-            <h3 className="text-lg font-bold text-white">Reject Request #{rejectingBooking.id}</h3>
-            <p className="text-xs text-slate-400">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-md rounded-2xl bg-white border-2 border-[#CBC3E3] shadow-2xl p-6 space-y-4">
+            <h3 className="text-lg font-bold text-[#301934] font-cinema">Reject Request #{rejectingBooking.id}</h3>
+            <p className="text-xs text-[#483248]">
               Please specify the reason for rejection. The customer will receive this message and
               100% of their ₹500 fee will be refunded to their wallet.
             </p>
@@ -611,19 +611,19 @@ export const StaffDashboardPage = () => {
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               placeholder="e.g., Interval intermission already reserved for private theatre trailer."
-              className="w-full p-3 rounded-xl bg-cinema-900 border border-cinema-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-400"
+              className="w-full p-3 rounded-xl bg-[#F8F6FC] border border-[#CBC3E3] text-xs text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68]"
             />
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setRejectingBooking(null)}
-                className="px-4 py-2 rounded-xl bg-cinema-800 text-slate-300 text-xs font-semibold hover:bg-cinema-750"
+                className="px-4 py-2 rounded-xl bg-[#F8F6FC] text-[#483248] text-xs font-semibold hover:bg-[#E6E6FA] border border-[#CBC3E3] cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmReject}
                 disabled={actionLoading}
-                className="px-4 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-white text-xs font-bold"
+                className="px-4 py-2 rounded-xl bg-[#800020] hover:bg-[#990026] text-white text-xs font-bold cursor-pointer"
               >
                 {actionLoading ? 'Rejecting...' : 'Reject & Refund'}
               </button>

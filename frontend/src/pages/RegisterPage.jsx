@@ -2,152 +2,219 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.js';
-import { Film, Lock, Mail, User, Phone, AlertCircle } from 'lucide-react';
+import { Film, Lock, Mail, User, Phone, AlertCircle, Sparkles } from 'lucide-react';
+
 export const RegisterPage = () => {
-    const navigate = useNavigate();
-    const { login } = useAuth();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [role, setRole] = useState('CUSTOMER');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (!name || !email || !password) {
-            setError('Name, email, and password are required.');
-            return;
-        }
-        if (password.length < 8) {
-            setError('Password must be at least 8 characters long.');
-            return;
-        }
-        if (password !== confirmPassword) {
-            setError('Passwords do not match.');
-            return;
-        }
-        try {
-            setLoading(true);
-            setError(null);
-            const res = await api.auth.register({
-                name,
-                email,
-                phone,
-                password,
-                role,
-            });
-            login(res.token, res.user);
-            if (res.user.role === 'STAFF') {
-                navigate('/staff');
-            }
-            else {
-                navigate('/dashboard');
-            }
-        }
-        catch (err) {
-            setError(err.message || 'Registration failed.');
-        }
-        finally {
-            setLoading(false);
-        }
-    };
-    return (<div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6">
-        {/* Header */}
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('CUSTOMER');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!name || !email || !password) {
+      setError('Name, email, and password are required.');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await api.auth.register({
+        name,
+        email,
+        phone,
+        password,
+        role,
+      });
+      login(res.token, res.user);
+      if (res.user.role === 'STAFF') {
+        navigate('/staff');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Registration failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12 relative">
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#9F2B68]/5 blur-3xl pointer-events-none rounded-full" />
+
+      <div className="w-full max-w-md space-y-6 relative z-10">
+        {/* Theatrical Marquee Header */}
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-cinema-red to-amber-600 flex items-center justify-center mx-auto shadow-lg shadow-cinema-red/20">
-            <Film className="w-6 h-6 text-white"/>
+          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#9F2B68] via-[#BF40BF] to-[#5D3FD3] flex items-center justify-center mx-auto shadow-xl shadow-[#9F2B68]/25 border border-white/20">
+            <Film className="w-7 h-7 text-white" />
           </div>
-          <h1 className="font-cinema text-3xl font-black text-white">Create Account</h1>
-          <p className="text-xs text-slate-400">
-            Join CineMoments to book unforgettable movie intervals
+          <span className="block text-[10px] font-mono font-bold tracking-[0.25em] text-[#9F2B68] uppercase">
+            MEMBERSHIP ENROLLMENT
+          </span>
+          <h1 className="font-cinema text-3xl sm:text-4xl font-black text-[#301934]">
+            Create VIP Account
+          </h1>
+          <p className="text-xs text-[#483248] font-medium">
+            Join CineMoments to direct unforgettable movie intervals on the silver screen
           </p>
         </div>
 
-        {/* Card */}
-        <div className="p-8 rounded-3xl bg-cinema-850 border border-cinema-700/80 shadow-2xl space-y-6">
-          {error && (<div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-400 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0"/>
+        {/* Marquee Card Frame */}
+        <div className="p-8 rounded-3xl bg-white border-2 border-[#CBC3E3] shadow-xl space-y-6">
+          {error && (
+            <div className="p-3.5 rounded-xl bg-[#FFF0F4] border border-[#800020]/30 text-xs text-[#800020] flex items-center gap-2 font-mono">
+              <AlertCircle className="w-4 h-4 shrink-0 text-[#800020]" />
               <span>{error}</span>
-            </div>)}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#301934] mb-1.5">
+                Full Name
+              </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"/>
-                <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Rahul Verma" className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-cinema-900 border border-cinema-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"/>
+                <User className="w-4 h-4 text-[#AA98A9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Rahul Verma"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#F8F6FC] border border-[#CBC3E3] text-sm text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68] focus:bg-white shadow-inner"
+                />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#301934] mb-1.5">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"/>
-                <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@example.com" className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-cinema-900 border border-cinema-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"/>
+                <Mail className="w-4 h-4 text-[#AA98A9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="rahul@cinema.com"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#F8F6FC] border border-[#CBC3E3] text-sm text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68] focus:bg-white shadow-inner"
+                />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Phone Number (Optional)
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#301934] mb-1.5">
+                Phone Number (For SMS Dispatch)
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"/>
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 (555) 012-3456" className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-cinema-900 border border-cinema-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"/>
+                <Phone className="w-4 h-4 text-[#AA98A9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+91 98765 43210"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#F8F6FC] border border-[#CBC3E3] text-sm text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68] focus:bg-white shadow-inner"
+                />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Role</label>
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#301934] mb-1.5">
+                Account Designation
+              </label>
               <div className="grid grid-cols-2 gap-3">
-                <button type="button" onClick={() => setRole('CUSTOMER')} className={`p-2.5 rounded-xl border text-xs font-semibold transition-all ${role === 'CUSTOMER'
-            ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-            : 'bg-cinema-900 border-cinema-700 text-slate-400'}`}>
-                  Customer
+                <button
+                  type="button"
+                  onClick={() => setRole('CUSTOMER')}
+                  className={`p-3 rounded-xl border text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    role === 'CUSTOMER'
+                      ? 'bg-[#FFF0F7] border-2 border-[#9F2B68] text-[#9F2B68] shadow-sm'
+                      : 'bg-[#F8F6FC] border-[#CBC3E3] text-[#483248] hover:bg-white'
+                  }`}
+                >
+                  Audience / Director
                 </button>
-                <button type="button" onClick={() => setRole('STAFF')} className={`p-2.5 rounded-xl border text-xs font-semibold transition-all ${role === 'STAFF'
-            ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-            : 'bg-cinema-900 border-cinema-700 text-slate-400'}`}>
+                <button
+                  type="button"
+                  onClick={() => setRole('STAFF')}
+                  className={`p-3 rounded-xl border text-xs font-mono font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                    role === 'STAFF'
+                      ? 'bg-[#FFF0F7] border-2 border-[#9F2B68] text-[#9F2B68] shadow-sm'
+                      : 'bg-[#F8F6FC] border-[#CBC3E3] text-[#483248] hover:bg-white'
+                  }`}
+                >
                   Theatre Staff
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#301934] mb-1.5">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"/>
-                <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 8 characters" className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-cinema-900 border border-cinema-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"/>
+                <Lock className="w-4 h-4 text-[#AA98A9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="At least 8 characters"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#F8F6FC] border border-[#CBC3E3] text-sm text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68] focus:bg-white shadow-inner"
+                />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-[#301934] mb-1.5">
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"/>
-                <input type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat password" className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-cinema-900 border border-cinema-700 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"/>
+                <Lock className="w-4 h-4 text-[#AA98A9] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat your password"
+                  className="w-full pl-10 pr-4 py-3 rounded-2xl bg-[#F8F6FC] border border-[#CBC3E3] text-sm text-[#301934] placeholder-[#AA98A9] focus:outline-none focus:border-[#9F2B68] focus:bg-white shadow-inner"
+                />
               </div>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-gradient-to-r from-cinema-gold to-amber-400 hover:from-amber-400 hover:to-cinema-gold text-cinema-950 font-bold text-sm shadow-md shadow-cinema-gold/20 transition-all duration-150 disabled:opacity-50 mt-2">
-              {loading ? 'Creating Account...' : 'Register'}
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn-cinema-shimmer w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#9F2B68] via-[#BF40BF] to-[#5D3FD3] hover:opacity-95 text-white font-mono font-bold text-xs uppercase tracking-widest shadow-xl shadow-[#9F2B68]/25 transition-all duration-150 disabled:opacity-50 mt-2 cursor-pointer"
+            >
+              {loading ? 'Registering VIP Pass...' : 'Create Account'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-xs text-slate-400">
-          Already have an account?{' '}
-          <Link to="/login" className="text-amber-400 font-semibold hover:underline">
-            Sign in
+        <p className="text-center text-xs text-[#483248]">
+          Already enrolled?{' '}
+          <Link to="/login" className="text-[#9F2B68] font-bold hover:underline">
+            Sign in here
           </Link>
         </p>
       </div>
-    </div>);
+    </div>
+  );
 };
