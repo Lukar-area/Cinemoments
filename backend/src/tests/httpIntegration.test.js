@@ -55,13 +55,13 @@ test('HTTP Live Endpoint Integration Testing (REST API)', async (suite) => {
         assert.ok(data.message.includes('required'));
     });
 
-    await suite.test('POST /api/auth/login rejects when CAPTCHA is invalid', async () => {
+    await suite.test('POST /api/auth/login rejects when CAPTCHA is invalid for custom user', async () => {
         const c = generateCaptcha();
         const res = await fetch(`${baseUrl}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                email: 'testuser@example.com',
+                email: 'newcustomuser@example.com',
                 password: 'Password123!',
                 captchaToken: c.token,
                 captchaSolution: 'WRONG',
@@ -71,6 +71,105 @@ test('HTTP Live Endpoint Integration Testing (REST API)', async (suite) => {
         const data = await res.json();
         assert.equal(data.success, false);
         assert.ok(data.message.toLowerCase().includes('captcha'));
+    });
+
+    await suite.test('POST /api/auth/login successfully logs in demo customer rahul@example.com', async () => {
+        const res = await fetch(`${baseUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: 'rahul@example.com',
+                password: 'Password123!',
+            }),
+        });
+        assert.equal(res.status, 200);
+        const data = await res.json();
+        assert.equal(data.success, true);
+        assert.ok(data.token, 'Should return JWT token');
+        assert.equal(data.user.email, 'rahul@example.com');
+        assert.equal(data.user.role, 'CUSTOMER');
+        assert.equal(data.user.wallet_balance, 2000);
+    });
+
+    await suite.test('POST /api/auth/login successfully logs in demo staff staff@grandcinema.com', async () => {
+        const res = await fetch(`${baseUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: 'staff@grandcinema.com',
+                password: 'Password123!',
+            }),
+        });
+        assert.equal(res.status, 200);
+        const data = await res.json();
+        assert.equal(data.success, true);
+        assert.equal(data.user.role, 'STAFF');
+        assert.ok(data.user.assignedTheatreId);
+    });
+
+    await suite.test('POST /api/auth/login successfully logs in demo admin admin@cinemoments.com', async () => {
+        const res = await fetch(`${baseUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: 'admin@cinemoments.com',
+                password: 'Password123!',
+            }),
+        });
+        assert.equal(res.status, 200);
+        const data = await res.json();
+        assert.equal(data.success, true);
+        assert.equal(data.user.role, 'ADMIN');
+    });
+
+    await suite.test('POST /api/auth/login rejects invalid password with 401', async () => {
+        const res = await fetch(`${baseUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: 'rahul@example.com',
+                password: 'IncorrectPassword!',
+            }),
+        });
+        assert.equal(res.status, 401);
+        const data = await res.json();
+        assert.equal(data.success, false);
+    });
+
+    await suite.test('POST /api/auth/guest initializes guest user session with wallet balance', async () => {
+        const res = await fetch(`${baseUrl}/api/auth/guest`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+        });
+        assert.equal(res.status, 200);
+        const data = await res.json();
+        assert.equal(data.success, true);
+        assert.ok(data.token);
+        assert.equal(data.user.role, 'CUSTOMER');
+        assert.equal(data.user.wallet_balance, 2000);
+    });
+
+    await suite.test('GET /api/auth/me returns authenticated user details with token', async () => {
+        // First log in
+        const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: 'rahul@example.com',
+                password: 'Password123!',
+            }),
+        });
+        const loginData = await loginRes.json();
+
+        // Call /api/auth/me
+        const meRes = await fetch(`${baseUrl}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${loginData.token}` },
+        });
+        assert.equal(meRes.status, 200);
+        const meData = await meRes.json();
+        assert.equal(meData.success, true);
+        assert.equal(meData.user.email, 'rahul@example.com');
+        assert.equal(meData.user.role, 'CUSTOMER');
     });
 
     await suite.test('Protected endpoints reject unauthenticated requests with 401', async () => {

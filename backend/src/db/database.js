@@ -1,6 +1,9 @@
 import mongoose from 'mongoose';
 import { config } from '../config/index.js';
 
+// Disable query buffering so disconnected queries fail fast or leverage fallback stores
+mongoose.set('bufferCommands', false);
+
 /**
  * Connects to MongoDB Atlas using Mongoose.
  * Configured with connection pooling and error handling for production readiness.
@@ -14,7 +17,7 @@ export async function connectDB() {
     console.log('✅ MongoDB Atlas connected successfully.');
   } catch (error) {
     console.error('❌ MongoDB connection error:', error.message);
-    console.warn('⚠️ Server will continue running to allow health checks. Verify Atlas Network Access whitelist (IP access) or run local mongod.');
+    console.warn('⚠️ Server will continue running with built-in fallbacks. Verify Atlas Network Access whitelist (IP access) or run local mongod.');
   }
 
   mongoose.connection.on('error', (err) => {

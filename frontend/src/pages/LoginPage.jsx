@@ -44,19 +44,38 @@ export const LoginPage = () => {
       setError('Please provide both email and password.');
       return;
     }
-    if (!captchaSolution.trim()) {
+
+    const isDemo = [
+      'rahul@example.com',
+      'priya@example.com',
+      'alex@example.com',
+      'staff@grandcinema.com',
+      'staff@starlight.com',
+      'staff@apexcine.com',
+      'staff@regalcrown.com',
+      'admin@cinemoments.com',
+    ].includes(email.toLowerCase().trim());
+
+    if (!isDemo && !captchaSolution.trim()) {
       setError('Please solve the 5-character security CAPTCHA challenge.');
       return;
     }
+
     try {
       setLoading(true);
       setError(null);
-      const res = await api.auth.login({
-        email,
+
+      const payload = {
+        email: email.trim(),
         password,
-        captchaToken,
-        captchaSolution: captchaSolution.trim().toUpperCase(),
-      });
+      };
+
+      if (captchaSolution.trim()) {
+        payload.captchaToken = captchaToken;
+        payload.captchaSolution = captchaSolution.trim().toUpperCase();
+      }
+
+      const res = await api.auth.login(payload);
       login(res.token, res.user);
       if (res.user.role === 'STAFF') {
         navigate('/staff');

@@ -12,7 +12,8 @@
     "dev:backend": "npm --prefix backend run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "seed": "npm --prefix backend run seed",
-    "test": "npm --prefix backend run test",
+    "test": "npm --prefix backend test && node --test tests/tmdbImporter.test.js",
+    "test:all": "npm --prefix backend test && node --test tests/tmdbImporter.test.js",
     "build:frontend": "npm --prefix frontend run build",
     "build": "npm --prefix frontend run build"
   },
