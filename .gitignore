@@ -14,7 +14,14 @@ _backup_ts/
 
 # Environment files
 .env
+.env.local
+.env.*.local
 atlas-credentials.env
+!.env.example
+
+# Downloaded TMDB movie posters
+public/images/movies/*
+!public/images/movies/.gitkeep
 
 # Uploads (encrypted media)
 backend/uploads/*

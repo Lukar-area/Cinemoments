@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMoments - Movie Showcase</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#fff1f2',
+              100: '#ffe4e6',
+              500: '#f43f5e',
+              600: '#e11d48',
+              700: '#be123c',
+              900: '#881337',
+            },
+            dark: {
+              800: '#1e293b',
+              900: '#0f172a',
+              950: '#020617',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-dark-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-brand-500 selection:text-white">
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 bg-dark-900/90 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center shadow-lg shadow-brand-500/20">
+          <i class="fa-solid fa-film text-white text-lg"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+            Cine<span class="text-brand-500">Moments</span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full border border-slate-700">Showcase</span>
+          </span>
+          <p class="text-[11px] text-slate-400 -mt-0.5">Offline-Ready Movie Catalog</p>
+        </div>
+      </div>
+
+      <!-- Database & Offline Badge -->
+      <div class="flex items-center space-x-3">
+        <div class="hidden sm:flex items-center gap-2 bg-emerald-950/80 text-emerald-400 border border-emerald-800/80 px-3 py-1.5 rounded-lg text-xs font-medium">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>MongoDB Connected &amp; Local Posters Only</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative bg-gradient-to-b from-dark-900 to-dark-950 border-b border-slate-800/80 py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto text-center space-y-4">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-900/40 border border-brand-700/50 text-brand-300 text-xs font-semibold">
+        <i class="fa-solid fa-database"></i>
+        <span>Pre-Downloaded Assets &bull; Zero Live TMDB API Calls</span>
+      </div>
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+        Popular Movies in Theatres
+      </h1>
+      <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+        Browse movie records stored in your local MongoDB database. All poster imagery is served directly from local disk storage in <code class="text-brand-400 bg-slate-900 px-2 py-0.5 rounded font-mono text-xs">public/images/movies/</code>.
+      </p>
+
+      <!-- Stats Bar -->
+      <div id="statsBar" class="pt-2 flex flex-wrap justify-center gap-4 text-xs text-slate-400">
+        <span class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
+          <i class="fa-solid fa-clapperboard text-brand-500 mr-1.5"></i>
+          <strong id="statTotalMovies" class="text-white">0</strong> Movies Stored
+        </span>
+        <span class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
+          <i class="fa-solid fa-image text-amber-500 mr-1.5"></i>
+          <strong id="statLocalPosters" class="text-white">Local</strong> Image Serving
+        </span>
+        <span class="bg-slate-900 border border-slate-800 px-3 py-1.5 rounded-lg">
+          <i class="fa-solid fa-shield-halved text-emerald-500 mr-1.5"></i>
+          <strong class="text-white">100%</strong> TMDB Rate Compliant
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content & Filters -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+
+    <!-- Search & Filters Bar -->
+    <div class="bg-dark-900 border border-slate-800 rounded-2xl p-4 sm:p-6 mb-8 shadow-xl space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        
+        <!-- Title Search -->
+        <div class="md:col-span-5 relative">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Search Title</label>
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm"></i>
+            <input 
+              type="text" 
+              id="searchInput" 
+              placeholder="Search movie by title or keywords..."
+              class="w-full bg-slate-950 border border-slate-700/80 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors"
+            />
+          </div>
+        </div>
+
+        <!-- Genre Filter -->
+        <div class="md:col-span-4">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Filter by Genre</label>
+          <select 
+            id="genreSelect" 
+            class="w-full bg-slate-950 border border-slate-700/80 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-colors">
+            <option value="">All Genres</option>
+            <option value="28">Action</option>
+            <option value="12">Adventure</option>
+            <option value="16">Animation</option>
+            <option value="35">Comedy</option>
+            <option value="80">Crime</option>
+            <option value="99">Documentary</option>
+            <option value="18">Drama</option>
+            <option value="10751">Family</option>
+            <option value="14">Fantasy</option>
+            <option value="36">History</option>
+            <option value="27">Horror</option>
+            <option value="10402">Music</option>
+            <option value="9648">Mystery</option>
+            <option value="10749">Romance</option>
+            <option value="878">Sci-Fi</option>
+            <option value="53">Thriller</option>
+            <option value="10752">War</option>
+            <option value="37">Western</option>
+          </select>
+        </div>
+
+        <!-- Rating Filter -->
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">
+            Min Rating: <span id="ratingDisplay" class="text-brand-400 font-bold">0.0</span>+
+          </label>
+          <div class="flex items-center space-x-3 pt-1">
+            <input 
+              type="range" 
+              id="ratingRange" 
+              min="0" 
+              max="9" 
+              step="0.5" 
+              value="0" 
+              class="w-full accent-brand-500 cursor-pointer"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="py-16 text-center space-y-4">
+      <div class="inline-block animate-spin text-brand-500 text-4xl">
+        <i class="fa-solid fa-circle-notch"></i>
+      </div>
+      <p class="text-slate-400 text-sm">Querying MongoDB for imported movie records...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden py-16 text-center space-y-4 bg-dark-900 border border-slate-800 rounded-2xl p-8">
+      <div class="w-16 h-16 rounded-2xl bg-slate-800/80 flex items-center justify-center mx-auto text-slate-500 text-2xl">
+        <i class="fa-solid fa-film-slash"></i>
+      </div>
+      <h3 class="text-lg font-bold text-white">No Movies Found</h3>
+      <p id="emptyMessage" class="text-slate-400 text-sm max-w-md mx-auto">
+        Your MongoDB database currently has no records in the "movies" collection.
+      </p>
+      <div class="pt-2">
+        <code class="text-xs font-mono bg-slate-950 text-brand-400 px-3 py-1.5 rounded-lg border border-slate-800">
+          npm run import:movies
+        </code>
+      </div>
+    </div>
+
+    <!-- Movie Grid -->
+    <div id="movieGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <!-- Populated dynamically -->
+    </div>
+
+  </main>
+
+  <!-- Movie Details Modal -->
+  <div id="movieModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-dark-900 border border-slate-700/80 rounded-2xl max-w-2xl w-full overflow-hidden shadow-2xl relative animate-in fade-in zoom-in duration-200">
+      <button id="closeModalBtn" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700 rounded-full w-8 h-8 flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div id="modalContent" class="p-6">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Mandatory TMDB Attribution -->
+  <footer class="bg-dark-900 border-t border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <!-- Logo & Project Description -->
+      <div class="flex items-center space-x-3 text-center md:text-left">
+        <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white">
+          <i class="fa-solid fa-film text-sm"></i>
+        </div>
+        <div>
+          <span class="font-bold text-white text-sm">CineMoments Movie Theatre System</span>
+          <p class="text-xs text-slate-400">Offline Movie Importer &amp; Interval Booking</p>
+        </div>
+      </div>
+
+      <!-- Mandatory TMDB Attribution Notice -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 text-xs text-slate-400 bg-slate-950/60 border border-slate-800/80 px-4 py-3 rounded-xl max-w-xl text-center sm:text-left">
+        <a href="https://www.themoviedb.org" target="_blank" rel="noopener noreferrer" class="shrink-0 transition-opacity hover:opacity-80">
+          <img 
+            src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_square_2-d537fb228cf3ded904ef09b136fe3fec72548ebc1fea3fbbd1ad9e36364db38b.svg" 
+            alt="The Movie Database (TMDB)" 
+            class="h-8 w-auto mx-auto"
+          />
+        </a>
+        <p>
+          This product uses the TMDB API but is not endorsed or certified by TMDB. 
+          Please review the <a href="https://www.themoviedb.org/documentation/api/terms-of-use" target="_blank" rel="noopener noreferrer" class="text-brand-400 hover:underline">TMDB API Terms of Use</a>.
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    const GENRE_MAP = {
+      28: 'Action', 12: 'Adventure', 16: 'Animation', 35: 'Comedy', 80: 'Crime',
+      99: 'Doc', 18: 'Drama', 10751: 'Family', 14: 'Fantasy', 36: 'History',
+      27: 'Horror', 10402: 'Music', 9648: 'Mystery', 10749: 'Romance',
+      878: 'Sci-Fi', 10770: 'TV', 53: 'Thriller', 10752: 'War', 37: 'Western'
+    };
+
+    let allMovies = [];
+
+    const searchInput = document.getElementById('searchInput');
+    const genreSelect = document.getElementById('genreSelect');
+    const ratingRange = document.getElementById('ratingRange');
+    const ratingDisplay = document.getElementById('ratingDisplay');
+    const movieGrid = document.getElementById('movieGrid');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const emptyMessage = document.getElementById('emptyMessage');
+    const statTotalMovies = document.getElementById('statTotalMovies');
+    const movieModal = document.getElementById('movieModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalContent = document.getElementById('modalContent');
+
+    // Fetch movies from MongoDB via local Express API
+    async function fetchMoviesFromMongo() {
+      loadingState.classList.remove('hidden');
+      movieGrid.classList.add('hidden');
+      emptyState.classList.add('hidden');
+
+      try {
+        const response = await fetch('/api/movies');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: Failed to fetch`);
+        }
+        const data = await response.json();
+        allMovies = data.movies || [];
+
+        statTotalMovies.textContent = data.totalInDatabase || allMovies.length;
+        applyFilters();
+      } catch (err) {
+        console.error('Error querying movies from local backend:', err);
+        loadingState.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        emptyMessage.textContent = 'Could not connect to local database server: ' + err.message + '. Run "npm run import:movies" then restart the server.';
+      }
+    }
+
+    // Filter and render movies in UI
+    function applyFilters() {
+      loadingState.classList.add('hidden');
+
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const selectedGenre = genreSelect.value ? parseInt(genreSelect.value, 10) : null;
+      const minRating = parseFloat(ratingRange.value);
+
+      const filtered = allMovies.filter((m) => {
+        const matchesSearch = !searchTerm || 
+          (m.title && m.title.toLowerCase().includes(searchTerm)) || 
+          (m.originalTitle && m.originalTitle.toLowerCase().includes(searchTerm)) ||
+          (m.overview && m.overview.toLowerCase().includes(searchTerm));
+
+        const matchesGenre = !selectedGenre || 
+          (Array.isArray(m.genreIds) && m.genreIds.includes(selectedGenre));
+
+        const matchesRating = (m.rating || 0) >= minRating;
+
+        return matchesSearch && matchesGenre && matchesRating;
+      });
+
+      if (filtered.length === 0) {
+        movieGrid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        emptyMessage.textContent = allMovies.length === 0 
+          ? 'Your MongoDB database has 0 movie records. Run: npm run import:movies'
+          : 'No movies match your current search and filter criteria.';
+      } else {
+        emptyState.classList.add('hidden');
+        movieGrid.classList.remove('hidden');
+        renderGrid(filtered);
+      }
+    }
+
+    // Render cards
+    function renderGrid(movies) {
+      movieGrid.innerHTML = '';
+
+      movies.forEach((movie) => {
+        const card = document.createElement('div');
+        card.className = 'group bg-dark-900 border border-slate-800 rounded-xl overflow-hidden hover:border-brand-500/50 hover:shadow-xl hover:shadow-brand-500/10 transition-all duration-300 flex flex-col cursor-pointer';
+
+        // Local poster or placeholder
+        const posterSrc = movie.posterLocalPath || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="450" viewBox="0 0 300 450" fill="%231e293b"><text x="50%" y="50%" fill="%2394a3b8" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="16">No Poster Available</text></svg>';
+
+        const releaseYear = movie.releaseDate ? movie.releaseDate.split('-')[0] : 'N/A';
+        const rating = (movie.rating || 0).toFixed(1);
+
+        const genreTags = (movie.genreIds || [])
+          .slice(0, 2)
+          .map(id => `<span class="bg-slate-800 text-slate-300 text-[10px] font-medium px-2 py-0.5 rounded">${GENRE_MAP[id] || 'Film'}</span>`)
+          .join('');
+
+        card.innerHTML = `
+          <div class="relative aspect-[2/3] bg-slate-900 overflow-hidden">
+            <img 
+              src="${posterSrc}" 
+              alt="${movie.title}" 
+              loading="lazy"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'300\\' height=\\'450\\' viewBox=\\'0 0 300 450\\' fill=\\'%231e293b\\'><text x=\\'50%\\' y=\\'50%\\' fill=\\'%2394a3b8\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' font-family=\\'sans-serif\\' font-size=\\'14\\'>Image Offline</text></svg>'"
+            />
+            <div class="absolute top-2 right-2 bg-dark-950/90 backdrop-blur-md border border-slate-700/80 px-2 py-1 rounded-lg text-xs font-bold text-amber-400 flex items-center gap-1 shadow-md">
+              <i class="fa-solid fa-star text-[10px]"></i>
+              <span>${rating}</span>
+            </div>
+            <div class="absolute top-2 left-2 bg-dark-950/80 border border-slate-700/60 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-slate-300">
+              ${movie.language || 'en'}
+            </div>
+          </div>
+          <div class="p-3.5 flex flex-col flex-1 justify-between space-y-2">
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                <span>${releaseYear}</span>
+                <div class="flex gap-1">${genreTags}</div>
+              </div>
+              <h3 class="font-bold text-sm text-white group-hover:text-brand-400 transition-colors line-clamp-1" title="${movie.title}">
+                ${movie.title}
+              </h3>
+              <p class="text-xs text-slate-400 line-clamp-3 mt-1.5 leading-relaxed">
+                ${movie.overview || 'No overview available for this title.'}
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+              <span class="font-mono text-[10px] text-slate-500">ID: ${movie.tmdbId}</span>
+              <span class="text-brand-400 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                View <i class="fa-solid fa-arrow-right text-[9px]"></i>
+              </span>
+            </div>
+          </div>
+        `;
+
+        card.addEventListener('click', () => openModal(movie));
+        movieGrid.appendChild(card);
+      });
+    }
+
+    // Modal Details View
+    function openModal(movie) {
+      const posterSrc = movie.posterLocalPath || '';
+      const genres = (movie.genreIds || []).map(id => GENRE_MAP[id] || id).join(', ') || 'N/A';
+
+      modalContent.innerHTML = `
+        <div class="flex flex-col sm:flex-row gap-6">
+          <div class="sm:w-1/3 aspect-[2/3] bg-slate-950 rounded-xl overflow-hidden shrink-0 border border-slate-700">
+            <img src="${posterSrc}" alt="${movie.title}" class="w-full h-full object-cover" />
+          </div>
+          <div class="sm:w-2/3 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="bg-amber-500/20 text-amber-400 text-xs px-2 py-0.5 rounded font-bold">
+                  ★ ${(movie.rating || 0).toFixed(1)} / 10
+                </span>
+                <span class="text-xs text-slate-400">${movie.releaseDate || 'Unknown Date'}</span>
+                <span class="text-xs uppercase bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded font-mono">${movie.language || 'en'}</span>
+              </div>
+              <h2 class="text-xl font-bold text-white">${movie.title}</h2>
+              ${movie.originalTitle && movie.originalTitle !== movie.title ? `<p class="text-xs text-slate-400 italic">Original: ${movie.originalTitle}</p>` : ''}
+              
+              <div class="text-xs text-slate-400 mt-2">
+                <strong>Genres:</strong> ${genres}
+              </div>
+
+              <div class="mt-3">
+                <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Overview</h4>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-h-40 overflow-y-auto pr-1">
+                  ${movie.overview || 'No synopsis provided.'}
+                </p>
+              </div>
+            </div>
+
+            <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-slate-400 space-y-1 font-mono">
+              <div><strong>TMDB ID:</strong> ${movie.tmdbId}</div>
+              <div class="truncate"><strong>Local Poster:</strong> ${movie.posterLocalPath || 'None'}</div>
+              <div><strong>Storage:</strong> Local Disk (public/images/movies/)</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      movieModal.classList.remove('hidden');
+    }
+
+    closeModalBtn.addEventListener('click', () => {
+      movieModal.classList.add('hidden');
+    });
+
+    movieModal.addEventListener('click', (e) => {
+      if (e.target === movieModal) movieModal.classList.add('hidden');
+    });
+
+    // Event listeners for filters
+    searchInput.addEventListener('input', applyFilters);
+    genreSelect.addEventListener('change', applyFilters);
+    ratingRange.addEventListener('input', (e) => {
+      ratingDisplay.textContent = parseFloat(e.target.value).toFixed(1);
+      applyFilters();
+    });
+
+    // Initial load
+    fetchMoviesFromMongo();
+  </script>
+</body>
+</html>

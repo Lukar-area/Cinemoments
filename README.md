@@ -125,6 +125,142 @@ cinemoments/
 
 ---
 
-## 🛡️ Production & Database Migration
-- Out of the box, CineMoments runs on **Node 24 native SQLite with WAL mode**.
-- To migrate to **PostgreSQL** or **MySQL 8.0**, execute the DDL scripts in `database/postgres_schema.sql` or `database/mysql_schema.sql`.
+## 🍿 TMDB Movie Data Importer & Local Showcase Website
+
+CineMoments includes an automated, rate-compliant **TMDB Movie Data Importer** (`scripts/importMovies.js`) and a standalone **Movie Showcase Website** (`server.js`) that reads records directly from MongoDB and serves downloaded posters locally with **zero external TMDB API calls during user browsing**.
+
+### 🌟 Importer Features
+- **Configurable Pagination**: Defaults to 5 pages (100 popular movies), customizable via `TMDB_PAGES` in `.env` or `--pages=N`.
+- **Complete Schema Mapping**: Saves `tmdbId`, `title`, `originalTitle`, `overview`, `releaseDate`, `language`, `genreIds`, `rating`, `posterPath`, and `posterLocalPath`.
+- **Local Poster Caching**: Downloads TMDB poster images into `public/images/movies/<tmdbId>.jpg`. Re-running does not re-download existing valid files.
+- **Idempotent Upsert**: Creates a unique index on `{ tmdbId: 1 }` and upserts documents so repeated executions never create duplicates.
+- **Resilience & Rate Limiting**: Built-in HTTP 429 backoff handling, download retries, and real-time console progress.
+- **Strict Privacy & Attribution**: Zero client-side TMDB API calls when users browse the catalog. Includes official TMDB attribution banner and legal compliance notice.
+
+---
+
+### 📦 Installation & Setup
+
+#### 1. Install Dependencies
+```bash
+# In the project root
+npm install
+```
+
+#### 2. Configure Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Open `.env` and provide your credentials:
+```env
+# MongoDB Connection URI (Local or Atlas)
+MONGODB_URI=mongodb://localhost:27017/cinemoments
+MONGODB_DB_NAME=cinemoments
+
+# The Movie Database (TMDB) API Read Access Token (v4 Bearer Token)
+TMDB_ACCESS_TOKEN=your_tmdb_api_read_access_token_here
+
+# Number of popular movie pages to import (optional, default: 5)
+TMDB_PAGES=5
+
+# Port for local showcase website (default: 3000)
+PORT=3000
+```
+
+> **How to get a TMDB Token:**
+> 1. Sign up for free at [themoviedb.org](https://www.themoviedb.org/signup).
+> 2. Go to **Settings** ➡️ **API** (https://www.themoviedb.org/settings/api).
+> 3. Under **API Read Access Token**, copy your Bearer Token and paste it into `.env` as `TMDB_ACCESS_TOKEN`.
+
+---
+
+### 🚀 Running the Importer
+
+Run the importer once to populate your MongoDB database and download posters:
+```bash
+# Using npm script (uses TMDB_PAGES from .env, default 5 pages)
+npm run import:movies
+
+# Or run directly with custom page count:
+node scripts/importMovies.js --pages=10
+```
+
+#### Expected Output:
+```text
+=================================================================
+🎬 CineMoments - TMDB Movie Data Importer
+=================================================================
+ℹ️  TMDB Access Token:    eyJhb...****
+ℹ️  MongoDB Target URI:   mongodb://localhost:27017/cinemoments
+ℹ️  Pages to Fetch:       5 (~100 movies)
+ℹ️  Local Poster Storage: E:\cinemoments\public\images\movies
+
+🔌 Connecting to MongoDB...
+✅ Connected successfully to MongoDB (database: "cinemoments")
+✅ Verified unique index on { tmdbId: 1 } in "movies" collection.
+
+🚀 Starting TMDB movie extraction...
+
+📥 Fetching TMDB Popular Movies Page 1/5... Done (20 movies retrieved)
+📥 Fetching TMDB Popular Movies Page 2/5... Done (20 movies retrieved)
+...
+=================================================================
+🎉 TMDB IMPORT COMPLETED SUCCESSFULLY!
+=================================================================
+⏱️  Duration:             6.2s
+📄 Pages Processed:      5
+🎬 Total Movies Fetched: 100
+✨ New Records Inserted: 100
+🔄 Records Updated:      0
+🖼️  Posters Stored:       100 saved to /public/images/movies/
+⚠️  Posters Missing:      0
+=================================================================
+```
+
+---
+
+### 🌐 Starting the Movie Showcase Website
+
+Start the local movie showcase website:
+```bash
+npm run start:website
+```
+Open **[http://localhost:3000](http://localhost:3000)** in your browser.
+- Displays all movies stored in MongoDB.
+- All movie posters load strictly from `/images/movies/<tmdbId>.jpg` on your local server.
+- Interactive filtering by title search, genre dropdown, and minimum rating slider.
+- Zero requests are sent to TMDB when users browse the website.
+
+---
+
+### 🔍 Verifying Imported Records in MongoDB
+
+You can verify the imported records using either `mongosh` or Node.js:
+
+#### Option A: Using `mongosh`
+```bash
+mongosh "mongodb://localhost:27017/cinemoments"
+```
+```javascript
+// Count total imported movies
+db.movies.countDocuments();
+
+// Inspect a sample movie record
+db.movies.findOne({}, { title: 1, tmdbId: 1, rating: 1, posterLocalPath: 1 });
+
+// Verify the unique index on tmdbId
+db.movies.getIndexes();
+```
+
+#### Option B: Inspecting the API Endpoint
+Navigate to `http://localhost:3000/api/movies` to view the JSON output directly from MongoDB.
+
+---
+
+### ⚖️ TMDB API Attribution & Terms of Use
+
+> **Notice:** This product uses the TMDB API but is not endorsed or certified by TMDB.
+> 
+> When using TMDB data and images, you must comply with the [TMDB API Terms of Use](https://www.themoviedb.org/documentation/api/terms-of-use). Remember to display the TMDB logo and attribution notice as shown on the website and in documentation.
+

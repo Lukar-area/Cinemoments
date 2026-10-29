@@ -27,5 +27,12 @@ export async function connectDB() {
 }
 
 export function isDBConnected() {
-  return mongoose.connection.readyState === 1;
+  return mongoose.connection?.readyState === 1;
+}
+
+/**
+ * Backward compatibility helper for legacy code / test suites.
+ */
+export function getDb() {
+  return mongoose.connection?.db || null;
 }
