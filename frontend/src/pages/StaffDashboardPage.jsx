@@ -26,6 +26,9 @@ import {
   Mail,
   RefreshCw,
   PlusCircle,
+  Zap,
+  Sparkles,
+  Ban,
 } from 'lucide-react';
 
 export const StaffDashboardPage = () => {
@@ -199,6 +202,21 @@ export const StaffDashboardPage = () => {
     }
   };
 
+
+  const handleAutoAllotFirstPerson = async () => {
+    try {
+      setActionLoading(true);
+      const res = await api.bookings.allotFirst({ theatreId: theatre?.id });
+      setActionSuccessNotice(
+        res.message || `Successfully allotted to first applicant! Competing requests marked as Occupied with full refunds.`
+      );
+      await fetchStaffData(theatre?.id);
+    } catch (err) {
+      alert(err.message || 'Failed to auto-allot first applicant.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
   const handleConfirmReject = async () => {
     if (!rejectingBooking) return;
     try {
@@ -247,6 +265,25 @@ export const StaffDashboardPage = () => {
       bookingId,
     });
   };
+
+  // Helper to identify the earliest (first) applicant among pending requests for each show
+  const earliestPendingShowMap = {};
+  for (const b of bookings) {
+    if (b.status === 'PENDING' || b.status === 'UNDER_REVIEW') {
+      const sid = b.show_id;
+      if (!earliestPendingShowMap[sid]) {
+        earliestPendingShowMap[sid] = b;
+      } else {
+        const curTime = new Date(earliestPendingShowMap[sid].created_at).getTime();
+        const bTime = new Date(b.created_at).getTime();
+        if (bTime < curTime) {
+          earliestPendingShowMap[sid] = b;
+        }
+      }
+    }
+  }
+
+  const pendingCount = bookings.filter(b => b.status === 'PENDING' || b.status === 'UNDER_REVIEW').length;
 
   const filteredBookings = bookings.filter(
     (b) =>
@@ -552,6 +589,36 @@ export const StaffDashboardPage = () => {
           {/* TAB 1: Review Queue */}
           {activeTab === 'QUEUE' && (
             <div className="space-y-6">
+              {/* Default First Person Allotment Banner */}
+              {pendingCount > 0 && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#FFF0F7] via-[#F8F5FF] to-[#FFF0F4] border-2 border-[#9F2B68]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9F2B68] to-[#BF40BF] text-white flex items-center justify-center font-bold shrink-0 shadow-md">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-[#301934] font-cinema flex items-center gap-2">
+                        Default Selection: Allot to First Person
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#9F2B68] text-white font-bold">
+                          {pendingCount} Pending Request{pendingCount > 1 ? 's' : ''}
+                        </span>
+                      </h4>
+                      <p className="text-xs text-[#5E435E] mt-0.5">
+                        Select defaultly the earliest applicant for each interval and allot the "Slot Occupied" message with 100% refund to all competing applicants for <strong>{theatre.name}</strong>.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAutoAllotFirstPerson}
+                    disabled={actionLoading}
+                    className="btn-cinema-shimmer px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#9F2B68] to-[#BF40BF] hover:opacity-95 text-white font-mono font-bold text-xs uppercase tracking-wider shadow-md shadow-[#9F2B68]/20 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap disabled:opacity-50 shrink-0 transition-all active:scale-95"
+                  >
+                    <Zap className="w-4 h-4 fill-current" />
+                    <span>{actionLoading ? 'Allotting...' : 'Allot First Person (Default)'}</span>
+                  </button>
+                </div>
+              )}
               {/* Controls: Search and Status Filter */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                 <div className="relative flex-1 max-w-md">
@@ -621,6 +688,15 @@ export const StaffDashboardPage = () => {
                               #{booking.id.toString().padStart(4, '0')}
                             </span>
                             <StatusBadge status={booking.status} size="sm" />
+                            {earliestPendingShowMap[booking.show_id]?.id === booking.id ? (
+                              <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 shadow-xs animate-in zoom-in-95">
+                                ⭐ 1st Applicant (Default Selection)
+                              </span>
+                            ) : (booking.status === 'PENDING' || booking.status === 'UNDER_REVIEW') && (
+                              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#FFF0F4] text-[#800020] border border-[#800020]/20 flex items-center gap-1">
+                                ⚠️ Competing Request
+                              </span>
+                            )}
                             <span className="text-[11px] px-2 py-0.5 rounded bg-[#FDF5FF] text-[#702963] font-semibold uppercase border border-[#CBC3E3]">
                               {booking.booking_type.replace(/_/g, ' ')}
                             </span>
@@ -638,6 +714,18 @@ export const StaffDashboardPage = () => {
                           <p className="text-xs text-[#702963] italic line-clamp-2 max-w-xl font-serif bg-[#FDF5FF] p-2 rounded-lg border border-[#CBC3E3]/40">
                             "{booking.message}"
                           </p>
+
+                          {(booking.rejection_reason || booking.status === 'EXPIRED') && (
+                            <div className="p-2.5 rounded-xl bg-[#FFF0F4] border border-[#800020]/20 text-[#800020] text-xs font-mono space-y-0.5">
+                              <span className="font-bold block text-[10px] uppercase">Allotted Status Notice:</span>
+                              <p className="text-xs text-[#483248]">
+                                {booking.rejection_reason || `Slot Occupied: This interval slot for ${theatre.name} has already been occupied.`}
+                              </p>
+                              <span className="text-[10px] text-[#5D3FD3] font-semibold block">
+                                100% refund processed to customer wallet.
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </div>
 
@@ -692,9 +780,18 @@ export const StaffDashboardPage = () => {
                           <>
                             <button
                               onClick={() => setAcceptingBooking(booking)}
-                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#9F2B68] to-[#BF40BF] text-white text-xs font-bold shadow-md shadow-[#9F2B68]/20 flex items-center gap-1.5 cursor-pointer"
+                              className={`px-4 py-2 rounded-xl text-white text-xs font-bold shadow-md flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
+                                earliestPendingShowMap[booking.show_id]?.id === booking.id
+                                  ? 'bg-gradient-to-r from-[#9F2B68] via-[#BF40BF] to-[#5D3FD3] shadow-[#9F2B68]/30 font-black'
+                                  : 'bg-gradient-to-r from-[#483248] to-[#301934] shadow-black/20'
+                              }`}
                             >
-                              <Check className="w-3.5 h-3.5" /> Accept
+                              <Zap className="w-3.5 h-3.5 fill-current" />
+                              <span>
+                                {earliestPendingShowMap[booking.show_id]?.id === booking.id
+                                  ? 'Allot (1st Person)'
+                                  : 'Allot This Request'}
+                              </span>
                             </button>
                             <button
                               onClick={() => setRejectingBooking(booking)}

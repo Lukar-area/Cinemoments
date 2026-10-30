@@ -1,5 +1,7 @@
 import { Router } from 'express';
-import { submitBooking, getMyBookings, getBookingDetails, getStaffBookingsController, handleAcceptBooking, handleRejectBooking, handleCancelBooking, getMyTransactionsController, getTheatreEarningsController, getAllTransactionsController, } from '../controllers/bookingController.js';
+import { submitBooking, getMyBookings, getBookingDetails, getStaffBookingsController, handleAcceptBooking, handleRejectBooking, handleCancelBooking, getMyTransactionsController, getTheatreEarningsController, getAllTransactionsController,
+    handleAllotFirstPersonBooking,
+} from '../controllers/bookingController.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { uploadMedia } from '../middleware/upload.js';
 const router = Router();
@@ -10,6 +12,7 @@ router.get('/transactions/my', authenticate, getMyTransactionsController);
 // Theatre Staff actions
 router.get('/staff/queue', authenticate, requireRole('STAFF', 'ADMIN'), getStaffBookingsController);
 router.get('/earnings/:theatreId?', authenticate, requireRole('STAFF', 'ADMIN'), getTheatreEarningsController);
+router.post('/staff/allot-first', authenticate, requireRole('STAFF', 'ADMIN'), handleAllotFirstPersonBooking);
 router.post('/:id/accept', authenticate, requireRole('STAFF', 'ADMIN'), handleAcceptBooking);
 router.post('/:id/reject', authenticate, requireRole('STAFF', 'ADMIN'), handleRejectBooking);
 

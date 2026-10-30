@@ -233,7 +233,7 @@ export const BookingWizardPage = () => {
         if (step === 4) {
             const currentShow = showsForMovie.find(s => s.id === selectedShowId) || allShows.find(s => s.id === selectedShowId);
             if (currentShow?.is_interval_booked) {
-                setErrorMessage('This interval slot is already booked. Please choose an open showtime.');
+                setErrorMessage(`Slot Occupied: This interval slot for ${selectedTheatre?.name || 'this theatre'} has already been occupied. Please choose an open showtime.`);
                 return;
             }
         }
@@ -746,13 +746,13 @@ export const BookingWizardPage = () => {
 
                                         <div className="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 pt-3 md:pt-0 border-[#E6E6FA]">
                                             {show.is_interval_booked ? (
-                                                <span className="flex items-center gap-1.5 text-xs text-[#800020] font-mono font-bold">
-                                                    <XCircle className="w-4 h-4 text-[#800020]" />
-                                                    Reserved
+                                                <span className="flex items-center gap-1.5 text-xs text-[#800020] font-mono font-bold px-2.5 py-1 rounded-full bg-[#FFF0F4] border border-[#800020]/20">
+                                                    <XCircle className="w-3.5 h-3.5 text-[#800020]" />
+                                                    Occupied for this Theatre
                                                 </span>
                                             ) : (
-                                                <span className="flex items-center gap-1.5 text-xs text-[#9F2B68] font-mono font-bold">
-                                                    <CheckCircle2 className="w-4 h-4 text-[#9F2B68]" />
+                                                <span className="flex items-center gap-1.5 text-xs text-[#9F2B68] font-mono font-bold px-2.5 py-1 rounded-full bg-[#FFF0F7] border border-[#9F2B68]/20">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 text-[#9F2B68]" />
                                                     Interval Open
                                                 </span>
                                             )}
@@ -850,11 +850,14 @@ export const BookingWizardPage = () => {
 
                             {/* Slot Availability Indicator */}
                             {selectedShow.is_interval_booked ? (
-                                <div className="p-3.5 rounded-xl bg-[#FFF0F4] border border-[#800020]/30 text-[#800020] text-xs font-mono flex items-center gap-2">
-                                    <XCircle className="w-4 h-4 shrink-0" />
-                                    <span>
-                                        This interval slot has already been reserved and accepted. Duplicate bookings are not permitted.
-                                    </span>
+                                <div className="p-4 rounded-xl bg-[#FFF0F4] border border-[#800020]/30 text-[#800020] text-xs font-mono space-y-1">
+                                    <div className="flex items-center gap-2 font-bold text-sm text-[#800020]">
+                                        <XCircle className="w-4 h-4 shrink-0" />
+                                        <span>Slot Occupied for {selectedTheatre?.name || selectedShow.theatre_name || 'this Theatre'}</span>
+                                    </div>
+                                    <p className="text-[11px] text-[#800020]/80">
+                                        This interval slot has already been occupied and allotted by theatre staff. Duplicate bookings cannot be accepted. Please choose another showtime.
+                                    </p>
                                 </div>
                             ) : (
                                 <div className="p-3.5 rounded-xl bg-[#E6E6FA] border border-[#CBC3E3] text-[#301934] text-xs font-mono flex items-center gap-2">

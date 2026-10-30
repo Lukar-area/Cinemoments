@@ -341,6 +341,21 @@ export const CustomerDashboardPage = () => {
                       <p className="text-xs text-[#702963] italic line-clamp-1 max-w-md font-serif bg-[#FDF5FF] px-2.5 py-1 rounded-lg border border-[#CBC3E3]/40">
                         "{booking.message}"
                       </p>
+
+                      {(booking.rejection_reason || booking.status === 'EXPIRED') && (
+                        <div className="mt-2.5 p-3 rounded-xl bg-[#FFF0F4] border border-[#800020]/25 text-[#800020] text-xs space-y-1 shadow-xs">
+                          <div className="flex items-center gap-1.5 font-bold uppercase tracking-wide text-[11px] text-[#800020]">
+                            <Ban className="w-3.5 h-3.5 text-[#800020]" />
+                            <span>Slot Occupied for this Theatre</span>
+                          </div>
+                          <p className="text-xs text-[#483248] leading-relaxed">
+                            {booking.rejection_reason || `This interval slot for ${booking.theatre_name} has already been occupied.`}
+                          </p>
+                          <p className="text-[11px] text-[#5D3FD3] font-semibold pt-0.5">
+                            ✓ 100% refund has been credited to your wallet balance.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
 

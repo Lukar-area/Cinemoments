@@ -9,6 +9,7 @@ import {
     getUserTransactions,
     getTheatreEarnings,
     getAllTransactions,
+    allotFirstPersonBooking,
 } from '../services/bookingService.js';
 import Theatre from '../models/Theatre.js';
 import IntervalBooking from '../models/IntervalBooking.js';
@@ -483,6 +484,48 @@ export async function getAllTransactionsController(req, res, next) {
             )
         ) {
             res.status(400).json({ success: false, message: error.message });
+            return;
+        }
+        next(error);
+    }
+}
+
+
+export async function handleAllotFirstPersonBooking(req, res, next) {
+    try {
+        const { showId, theatreId } = req.body;
+        const staffUserId = req.user.id;
+
+        // Security check: if staff, verify authorization for theatre
+        if (req.user?.role === 'STAFF') {
+            const authorizedIds = await getAuthorizedTheatreIdsForUser(req.user);
+            if (theatreId && !authorizedIds.includes(theatreId.toString())) {
+                res.status(403).json({
+                    success: false,
+                    message: 'Unauthorized: You are not authorized to manage bookings for this theatre.',
+                });
+                return;
+            }
+        }
+
+        const result = await allotFirstPersonBooking({
+            showId,
+            theatreId,
+            staffUserId,
+            ipAddress: req.ip,
+        });
+
+        res.json({
+            success: true,
+            message: result.message,
+            acceptedBookingId: result.acceptedBookingId,
+            firstCustomerName: result.firstCustomerName,
+            expiredCount: result.expiredCount,
+            result,
+        });
+    } catch (error) {
+        if (error.statusCode) {
+            res.status(error.statusCode).json({ success: false, message: error.message });
             return;
         }
         next(error);

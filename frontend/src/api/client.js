@@ -111,6 +111,10 @@ export const api = {
         accept: (bookingId) => request(`/bookings/${bookingId}/accept`, {
             method: 'POST',
         }),
+        allotFirst: (data) => request('/bookings/staff/allot-first', {
+            method: 'POST',
+            body: JSON.stringify(data),
+        }),
         reject: (bookingId, reason) => request(`/bookings/${bookingId}/reject`, {
             method: 'POST',
             body: JSON.stringify({ reason }),

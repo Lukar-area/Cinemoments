@@ -221,6 +221,10 @@ export async function acceptBooking(bookingId, staffUserId, ipAddress) {
         status: { $in: ['PENDING', 'UNDER_REVIEW'] }
     });
 
+    const movieTitle = booking.show_id?.movie_id?.title || 'Movie';
+    const theatreName = booking.show_id?.screen_id?.theatre_id?.name || 'Theatre';
+    const occupiedReason = `Slot Occupied: This interval slot for ${theatreName} has already been occupied by another customer.`;
+
     // Automatically expire competing requests and refund their transactions
     if (competing.length > 0) {
         await IntervalBooking.updateMany(
@@ -229,16 +233,16 @@ export async function acceptBooking(bookingId, staffUserId, ipAddress) {
                 _id: { $ne: booking._id },
                 status: { $in: ['PENDING', 'UNDER_REVIEW'] }
             },
-            { status: 'EXPIRED' }
+            {
+                status: 'EXPIRED',
+                rejection_reason: occupiedReason
+            }
         );
 
         for (const comp of competing) {
             await refundBookingTransaction(comp._id);
         }
     }
-
-    const movieTitle = booking.show_id?.movie_id?.title || 'Movie';
-    const theatreName = booking.show_id?.screen_id?.theatre_id?.name || 'Theatre';
 
     // Create in-app notifications and email/SMS alerts
     await createNotification(
@@ -794,4 +798,48 @@ export async function getStaffBookings(theatreId, filterStatus) {
             has_media: !!media,
         };
     });
+}
+
+
+/**
+ * Automatically allots the interval slot to the first applicant (earliest created_at)
+ * and allots the "Slot Occupied" message with 100% refund to all competing applicants.
+ */
+export async function allotFirstPersonBooking({ showId, theatreId, staffUserId, ipAddress }) {
+    if (!isDBConnected()) {
+        return fallbackStore.allotFirstPersonBooking({ showId, theatreId });
+    }
+
+    let query = { status: { $in: ['PENDING', 'UNDER_REVIEW'] } };
+    if (showId && mongoose.Types.ObjectId.isValid(showId)) {
+        query.show_id = showId;
+    } else if (theatreId && mongoose.Types.ObjectId.isValid(theatreId)) {
+        const screens = await Screen.find({ theatre_id: theatreId }).select('_id');
+        const screenIds = screens.map(s => s._id);
+        const shows = await Show.find({ screen_id: { $in: screenIds } }).select('_id');
+        const showIds = shows.map(s => s._id);
+        query.show_id = { $in: showIds };
+    }
+
+    // Sort by created_at: 1 to select defaultly the first person
+    const pendingBookings = await IntervalBooking.find(query)
+        .sort({ created_at: 1 })
+        .populate('user_id', 'name email');
+
+    if (pendingBookings.length === 0) {
+        const err = new Error('No pending booking requests found to allot for this theatre.');
+        err.statusCode = 404;
+        throw err;
+    }
+
+    const firstBooking = pendingBookings[0];
+    const acceptRes = await acceptBooking(firstBooking._id, staffUserId, ipAddress);
+
+    return {
+        success: true,
+        acceptedBookingId: firstBooking._id.toString(),
+        firstCustomerName: firstBooking.user_id?.name || 'First Customer',
+        expiredCount: acceptRes.expiredCount,
+        message: `Interval slot successfully allotted to the first applicant (${firstBooking.user_id?.name || 'Customer'}). All other competing requests for this theatre marked as Occupied.`,
+    };
 }

@@ -28,9 +28,9 @@ export const StatusBadge = ({ status, size = 'md' }) => {
           Rejected
         </span>);
         case 'EXPIRED':
-            return (<span className={`inline-flex items-center gap-1.5 rounded-full font-semibold bg-[#F4F4F8] text-[#915F6D] border border-[#CBC3E3] ${sizeClasses}`}>
-          <AlertTriangle className="w-3.5 h-3.5 text-[#915F6D]"/>
-          Expired Slot
+            return (<span className={`inline-flex items-center gap-1.5 rounded-full font-semibold bg-[#FFF0F4] text-[#800020] border border-[#800020]/30 shadow-xs ${sizeClasses}`}>
+          <Ban className="w-3.5 h-3.5 text-[#800020]"/>
+          Slot Occupied (Refunded)
         </span>);
         case 'CANCELLED':
             return (<span className={`inline-flex items-center gap-1.5 rounded-full font-semibold bg-[#F4F4F8] text-[#AA98A9] border border-[#CBC3E3] ${sizeClasses}`}>

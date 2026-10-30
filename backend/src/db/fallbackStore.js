@@ -688,6 +688,36 @@ export const fallbackStore = {
         return bookings.find(b => b.id === bookingId) || null;
     },
 
+    allotFirstPersonBooking: ({ showId, theatreId } = {}) => {
+        let candidates = inMemoryBookings.filter(b => b.status === 'PENDING' || b.status === 'UNDER_REVIEW');
+        if (showId) {
+            candidates = candidates.filter(b => b.show_id === showId);
+        } else if (theatreId) {
+            const screens = FALLBACK_SCREENS.filter(sc => sc.theatre_id === theatreId);
+            const screenIds = new Set(screens.map(sc => sc.id));
+            const shows = inMemoryShows.filter(s => screenIds.has(s.screen_id));
+            const showIds = new Set(shows.map(s => s.id));
+            candidates = candidates.filter(b => showIds.has(b.show_id));
+        }
+
+        candidates.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+        if (candidates.length === 0) {
+            const err = new Error('No pending booking requests found to allot for this theatre.');
+            err.statusCode = 404;
+            throw err;
+        }
+
+        const firstBooking = candidates[0];
+        const res = fallbackStore.acceptBooking(firstBooking.id);
+        return {
+            success: true,
+            acceptedBookingId: firstBooking.id,
+            firstCustomerName: firstBooking.customer_name || 'First Applicant',
+            expiredCount: res.expiredCount,
+            message: `Interval slot successfully allotted to the first applicant (${firstBooking.customer_name || 'Customer'}). All other competing requests for this theatre marked as Occupied.`,
+        };
+    },
     acceptBooking: (bookingId) => {
         const booking = inMemoryBookings.find(b => b.id === bookingId);
         if (!booking) {
@@ -709,10 +739,15 @@ export const fallbackStore = {
             show.is_interval_booked = 1;
         }
 
-        // Expire competing
+        const screen = show ? FALLBACK_SCREENS.find(sc => sc.id === show.screen_id) : null;
+        const theatre = screen ? FALLBACK_THEATRES.find(t => t.id === screen.theatre_id) : null;
+        const theatreName = theatre ? theatre.name : 'this theatre';
+
+        // Expire competing and allot occupied message
         const competing = inMemoryBookings.filter(b => b.show_id === booking.show_id && b.id !== booking.id && (b.status === 'PENDING' || b.status === 'UNDER_REVIEW'));
         for (const c of competing) {
             c.status = 'EXPIRED';
+            c.rejection_reason = `Slot Occupied: This interval slot for ${theatreName} has already been occupied by another customer.`;
         }
 
         return {
