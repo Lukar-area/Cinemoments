@@ -1,15 +1,75 @@
+import mongoose from 'mongoose';
 import Movie from '../models/Movie.js';
 import Show from '../models/Show.js';
+import Screen from '../models/Screen.js';
 import IntervalBooking from '../models/IntervalBooking.js';
+import { isDBConnected } from '../db/database.js';
+import { fallbackStore } from '../db/fallbackStore.js';
 
 export async function getAllMovies(req, res, next) {
     try {
-        const todayStr = new Date().toISOString().split('T')[0];
-        const movies = await Movie.find().sort({ title: 1 });
+        const { theatreId } = req.query;
 
-        // Aggregate upcoming show counts per movie
+        if (!isDBConnected()) {
+            const movies = fallbackStore.getMovies({ theatreId });
+            res.json({ success: true, movies });
+            return;
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+
+        // If filtering by theatreId: return only movies currently scheduled at that theatre
+        if (theatreId) {
+            if (!mongoose.Types.ObjectId.isValid(theatreId)) {
+                // Check if found in fallback store
+                const fallbackMovies = fallbackStore.getMovies({ theatreId });
+                res.json({ success: true, movies: fallbackMovies });
+                return;
+            }
+
+            const screens = await Screen.find({ theatre_id: theatreId }).select('_id');
+            const screenIds = screens.map(s => s._id);
+
+            const showsAtTheatre = await Show.find({
+                screen_id: { $in: screenIds },
+                show_date: { $gte: todayStr },
+                status: 'SCHEDULED'
+            });
+
+            if (showsAtTheatre.length === 0) {
+                res.json({ success: true, movies: [] });
+                return;
+            }
+
+            const movieShowCountMap = {};
+            for (const s of showsAtTheatre) {
+                const mid = s.movie_id.toString();
+                movieShowCountMap[mid] = (movieShowCountMap[mid] || 0) + 1;
+            }
+
+            const distinctMovieIds = Object.keys(movieShowCountMap);
+            const movies = await Movie.find({ _id: { $in: distinctMovieIds } }).sort({ title: 1 });
+
+            const formattedMovies = movies.map(m => {
+                const json = m.toJSON();
+                json.upcoming_shows_count = movieShowCountMap[m._id.toString()] || 0;
+                return json;
+            });
+
+            res.json({ success: true, movies: formattedMovies });
+            return;
+        }
+
+        // Default: All movies with aggregate upcoming show counts
+        let movies = await Movie.find().sort({ title: 1 });
+        if (movies.length === 0) {
+            const fallbackMovies = fallbackStore.getMovies();
+            res.json({ success: true, movies: fallbackMovies });
+            return;
+        }
+
         const showCounts = await Show.aggregate([
-            { $match: { show_date: { $gte: todayStr } } },
+            { $match: { show_date: { $gte: todayStr }, status: 'SCHEDULED' } },
             { $group: { _id: '$movie_id', count: { $sum: 1 } } }
         ]);
 
@@ -25,8 +85,7 @@ export async function getAllMovies(req, res, next) {
         });
 
         res.json({ success: true, movies: moviesWithCount });
-    }
-    catch (error) {
+    } catch (error) {
         next(error);
     }
 }
@@ -34,6 +93,19 @@ export async function getAllMovies(req, res, next) {
 export async function getMovieById(req, res, next) {
     try {
         const movieId = req.params.id;
+
+        if (!isDBConnected() || !mongoose.Types.ObjectId.isValid(movieId)) {
+            const result = fallbackStore.getMovieById(movieId);
+            if (result) {
+                res.json({ success: true, movie: result.movie, shows: result.shows });
+                return;
+            }
+            if (!isDBConnected()) {
+                res.status(404).json({ success: false, message: 'Movie not found.' });
+                return;
+            }
+        }
+
         const movie = await Movie.findById(movieId);
         if (!movie) {
             res.status(404).json({ success: false, message: 'Movie not found.' });
@@ -45,7 +117,8 @@ export async function getMovieById(req, res, next) {
         // Upcoming shows for this movie across all theatres
         const shows = await Show.find({
             movie_id: movieId,
-            show_date: { $gte: todayStr }
+            show_date: { $gte: todayStr },
+            status: 'SCHEDULED'
         })
         .populate({
             path: 'screen_id',
@@ -83,9 +156,11 @@ export async function getMovieById(req, res, next) {
             };
         });
 
-        res.json({ success: true, movie: movie.toJSON(), shows: formattedShows });
-    }
-    catch (error) {
+        const movieJson = movie.toJSON();
+        movieJson.upcoming_shows_count = formattedShows.length;
+
+        res.json({ success: true, movie: movieJson, shows: formattedShows });
+    } catch (error) {
         next(error);
     }
 }
@@ -114,8 +189,7 @@ export async function createMovie(req, res, next) {
             message: 'Movie created successfully.',
             movieId: movie._id.toString(),
         });
-    }
-    catch (error) {
+    } catch (error) {
         next(error);
     }
 }

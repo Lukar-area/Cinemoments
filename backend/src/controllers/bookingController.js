@@ -11,7 +11,8 @@ import {
     getAllTransactions,
 } from '../services/bookingService.js';
 import Theatre from '../models/Theatre.js';
-import TheatreStaff from '../models/TheatreStaff.js';
+import IntervalBooking from '../models/IntervalBooking.js';
+import { getAuthorizedTheatreIdsForUser } from '../services/theatreAuthService.js';
 
 export async function submitBooking(req, res, next) {
     try {
@@ -41,6 +42,19 @@ export async function submitBooking(req, res, next) {
         });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
@@ -62,6 +76,19 @@ export async function getMyBookings(req, res, next) {
         res.json({ success: true, stats, bookings });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
@@ -81,32 +108,73 @@ export async function getBookingDetails(req, res, next) {
         res.json({ success: true, booking });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
 
 export async function getStaffBookingsController(req, res, next) {
     try {
-        let theatreId = req.query.theatreId;
+        const requestedTheatreId = req.query.theatreId;
+        let targetTheatreId = null;
 
         if (req.user?.role === 'STAFF') {
-            const staffRow = await TheatreStaff.findOne({ user_id: req.user.id });
-            if (staffRow) {
-                theatreId = staffRow.theatre_id.toString();
-            } else {
-                const ownerRow = await Theatre.findOne({ owner_id: req.user.id });
-                if (ownerRow) {
-                    theatreId = ownerRow._id.toString();
-                }
+            const authorizedIds = await getAuthorizedTheatreIdsForUser(req.user);
+
+            if (authorizedIds.length === 0) {
+                res.json({
+                    success: true,
+                    theatreId: null,
+                    message: 'No theatre associated with this staff account.',
+                    cards: {
+                        pendingRequests: 0,
+                        todayAcceptedBookings: 0,
+                        upcomingIntervalBookings: 0,
+                        completedBookings: 0,
+                        totalRequests: 0,
+                    },
+                    bookings: [],
+                });
+                return;
             }
+
+            if (requestedTheatreId) {
+                if (!authorizedIds.includes(requestedTheatreId.toString())) {
+                    res.status(403).json({
+                        success: false,
+                        message: 'Unauthorized: You do not have permission to access bookings for this theatre.',
+                    });
+                    return;
+                }
+                targetTheatreId = requestedTheatreId.toString();
+            } else {
+                targetTheatreId = authorizedIds[0];
+            }
+        } else if (req.user?.role === 'ADMIN') {
+            if (requestedTheatreId) {
+                targetTheatreId = requestedTheatreId.toString();
+            } else {
+                const firstTheatre = await Theatre.findOne({ status: 'ACTIVE' });
+                targetTheatreId = firstTheatre ? firstTheatre._id.toString() : null;
+            }
+        } else {
+            res.status(403).json({ success: false, message: 'Access denied.' });
+            return;
         }
 
-        if (!theatreId) {
-            const firstTheatre = await Theatre.findOne();
-            theatreId = firstTheatre ? firstTheatre._id.toString() : null;
-        }
-
-        if (!theatreId) {
+        if (!targetTheatreId) {
             res.json({
                 success: true,
                 theatreId: null,
@@ -123,8 +191,8 @@ export async function getStaffBookingsController(req, res, next) {
         }
 
         const filterStatus = req.query.status || 'ALL';
-        const bookings = await getStaffBookings(theatreId, filterStatus);
-        const allTheatreBookings = await getStaffBookings(theatreId, 'ALL');
+        const bookings = await getStaffBookings(targetTheatreId, filterStatus);
+        const allTheatreBookings = await getStaffBookings(targetTheatreId, 'ALL');
         const today = new Date().toISOString().split('T')[0];
 
         const cards = {
@@ -137,12 +205,25 @@ export async function getStaffBookingsController(req, res, next) {
 
         res.json({
             success: true,
-            theatreId,
+            theatreId: targetTheatreId,
             cards,
             bookings,
         });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
@@ -151,6 +232,28 @@ export async function handleAcceptBooking(req, res, next) {
     try {
         const bookingId = req.params.id;
         const staffUserId = req.user.id;
+
+        // Security check: verify staff belongs to the theatre for this booking
+        if (req.user?.role === 'STAFF') {
+            const booking = await IntervalBooking.findById(bookingId).populate({
+                path: 'show_id',
+                populate: { path: 'screen_id', select: 'theatre_id' }
+            });
+            if (!booking) {
+                res.status(404).json({ success: false, message: 'Booking request not found.' });
+                return;
+            }
+            const theatreId = booking.show_id?.screen_id?.theatre_id?.toString();
+            const authorizedIds = await getAuthorizedTheatreIdsForUser(req.user);
+            if (!theatreId || !authorizedIds.includes(theatreId)) {
+                res.status(403).json({
+                    success: false,
+                    message: 'Unauthorized: You are not authorized to manage bookings for this theatre.',
+                });
+                return;
+            }
+        }
+
         const result = await acceptBooking(bookingId, staffUserId, req.ip);
         res.json({
             success: true,
@@ -159,6 +262,19 @@ export async function handleAcceptBooking(req, res, next) {
         });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
@@ -168,6 +284,28 @@ export async function handleRejectBooking(req, res, next) {
         const bookingId = req.params.id;
         const { reason } = req.body;
         const staffUserId = req.user.id;
+
+        // Security check: verify staff belongs to the theatre for this booking
+        if (req.user?.role === 'STAFF') {
+            const booking = await IntervalBooking.findById(bookingId).populate({
+                path: 'show_id',
+                populate: { path: 'screen_id', select: 'theatre_id' }
+            });
+            if (!booking) {
+                res.status(404).json({ success: false, message: 'Booking request not found.' });
+                return;
+            }
+            const theatreId = booking.show_id?.screen_id?.theatre_id?.toString();
+            const authorizedIds = await getAuthorizedTheatreIdsForUser(req.user);
+            if (!theatreId || !authorizedIds.includes(theatreId)) {
+                res.status(403).json({
+                    success: false,
+                    message: 'Unauthorized: You are not authorized to manage bookings for this theatre.',
+                });
+                return;
+            }
+        }
+
         const result = await rejectBooking(bookingId, staffUserId, reason, req.ip);
         res.json({
             success: true,
@@ -176,6 +314,19 @@ export async function handleRejectBooking(req, res, next) {
         });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
@@ -192,6 +343,19 @@ export async function handleCancelBooking(req, res, next) {
         });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
@@ -203,28 +367,70 @@ export async function getMyTransactionsController(req, res, next) {
         res.json({ success: true, transactions });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
 
 export async function getTheatreEarningsController(req, res, next) {
     try {
-        let theatreId = req.params.theatreId;
-        if (!theatreId && req.user?.role === 'STAFF') {
-            const staffRow = await TheatreStaff.findOne({ user_id: req.user.id });
-            if (staffRow) {
-                theatreId = staffRow.theatre_id.toString();
-            } else {
-                const ownerRow = await Theatre.findOne({ owner_id: req.user.id });
-                if (ownerRow) theatreId = ownerRow._id.toString();
+        const requestedTheatreId = req.params.theatreId;
+        let targetTheatreId = null;
+
+        if (req.user?.role === 'STAFF') {
+            const authorizedIds = await getAuthorizedTheatreIdsForUser(req.user);
+            if (authorizedIds.length === 0) {
+                res.json({
+                    success: true,
+                    theatreId: null,
+                    summary: {
+                        total_earnings: 0,
+                        total_booking_volume: 0,
+                        completed_transactions: 0,
+                        refunded_transactions: 0,
+                    },
+                    transactions: [],
+                });
+                return;
             }
-        }
-        if (!theatreId) {
-            const firstTheatre = await Theatre.findOne();
-            theatreId = firstTheatre ? firstTheatre._id.toString() : null;
+
+            if (requestedTheatreId && requestedTheatreId !== 'undefined' && requestedTheatreId !== 'null') {
+                if (!authorizedIds.includes(requestedTheatreId.toString())) {
+                    res.status(403).json({
+                        success: false,
+                        message: 'Unauthorized: You do not have permission to view earnings for this theatre.',
+                    });
+                    return;
+                }
+                targetTheatreId = requestedTheatreId.toString();
+            } else {
+                targetTheatreId = authorizedIds[0];
+            }
+        } else if (req.user?.role === 'ADMIN') {
+            if (requestedTheatreId && requestedTheatreId !== 'undefined' && requestedTheatreId !== 'null') {
+                targetTheatreId = requestedTheatreId.toString();
+            } else {
+                const firstTheatre = await Theatre.findOne({ status: 'ACTIVE' });
+                targetTheatreId = firstTheatre ? firstTheatre._id.toString() : null;
+            }
+        } else {
+            res.status(403).json({ success: false, message: 'Access denied.' });
+            return;
         }
 
-        if (!theatreId) {
+        if (!targetTheatreId) {
             res.json({
                 success: true,
                 theatreId: null,
@@ -239,10 +445,23 @@ export async function getTheatreEarningsController(req, res, next) {
             return;
         }
 
-        const earnings = await getTheatreEarnings(theatreId);
-        res.json({ success: true, theatreId, ...earnings });
+        const earnings = await getTheatreEarnings(targetTheatreId);
+        res.json({ success: true, theatreId: targetTheatreId, ...earnings });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }
@@ -253,6 +472,19 @@ export async function getAllTransactionsController(req, res, next) {
         res.json({ success: true, ...data });
     }
     catch (error) {
+        if (
+            error.message && (
+                error.message.includes('already') ||
+                error.message.includes('not found') ||
+                error.message.includes('Insufficient') ||
+                error.message.includes('started') ||
+                error.message.includes('required') ||
+                error.message.includes('active')
+            )
+        ) {
+            res.status(400).json({ success: false, message: error.message });
+            return;
+        }
         next(error);
     }
 }

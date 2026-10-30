@@ -1,3 +1,4 @@
+import { isDBConnected } from '../db/database.js';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
@@ -11,8 +12,13 @@ import Screen from '../models/Screen.js';
 import { createNotification } from '../services/notificationService.js';
 import { config } from '../config/index.js';
 import { validateMediaBuffer, encryptBuffer, decryptBuffer } from '../services/cryptoService.js';
+import { getAuthorizedTheatreIdsForUser, isUserAuthorizedForTheatre } from '../services/theatreAuthService.js';
 
 export async function getConversations(req, res, next) {
+    if (!isDBConnected()) {
+        res.json({ success: true, conversations: [] });
+        return;
+    }
     try {
         const currentUser = req.user;
 
@@ -81,22 +87,26 @@ export async function getConversations(req, res, next) {
         // If STAFF or ADMIN
         let theatreId = null;
         if (currentUser.role === 'STAFF') {
-            const staffRow = await TheatreStaff.findOne({ user_id: currentUser.id });
-            if (staffRow) {
-                theatreId = staffRow.theatre_id.toString();
-            } else {
-                const ownerRow = await Theatre.findOne({ owner_id: currentUser.id });
-                if (ownerRow) {
-                    theatreId = ownerRow._id.toString();
+            const authorizedIds = await getAuthorizedTheatreIdsForUser(currentUser);
+            if (authorizedIds.length === 0) {
+                res.json({ success: true, theatreId: null, conversations: [] });
+                return;
+            }
+            if (req.query.theatreId) {
+                if (!authorizedIds.includes(req.query.theatreId.toString())) {
+                    res.status(403).json({ success: false, message: 'Unauthorized: You do not have permission to view chats for this theatre.' });
+                    return;
                 }
+                theatreId = req.query.theatreId.toString();
+            } else {
+                theatreId = authorizedIds[0];
             }
         } else if (currentUser.role === 'ADMIN') {
             theatreId = req.query.theatreId || null;
-        }
-
-        if (!theatreId) {
-            const firstTheatre = await Theatre.findOne();
-            theatreId = firstTheatre ? firstTheatre._id.toString() : null;
+            if (!theatreId) {
+                const firstTheatre = await Theatre.findOne({ status: 'ACTIVE' });
+                theatreId = firstTheatre ? firstTheatre._id.toString() : null;
+            }
         }
 
         if (!theatreId) {
@@ -158,12 +168,24 @@ export async function getConversations(req, res, next) {
 }
 
 export async function getMessages(req, res, next) {
+    if (!isDBConnected()) {
+        res.json({ success: true, messages: [] });
+        return;
+    }
     try {
         const currentUser = req.user;
         const theatreId = req.query.theatreId;
         if (!theatreId) {
             res.status(400).json({ success: false, message: 'theatreId query parameter is required.' });
             return;
+        }
+
+        if (currentUser.role === 'STAFF') {
+            const isAuth = await isUserAuthorizedForTheatre(currentUser, theatreId);
+            if (!isAuth) {
+                res.status(403).json({ success: false, message: 'Unauthorized: You are not authorized to access messages for this theatre.' });
+                return;
+            }
         }
 
         let customerUserId;
@@ -222,6 +244,20 @@ export async function getMessages(req, res, next) {
 }
 
 export async function sendMessage(req, res, next) {
+    if (!isDBConnected()) {
+        res.json({
+            success: true,
+            message: {
+                id: 'msg_mem_' + Date.now(),
+                message: req.body.message || '',
+                sender_role: req.user.role,
+                sender_id: req.user.id,
+                sender_name: req.user.name,
+                created_at: new Date().toISOString(),
+            }
+        });
+        return;
+    }
     try {
         const currentUser = req.user;
         const { theatreId, userId, message = '', bookingId } = req.body;
@@ -230,6 +266,14 @@ export async function sendMessage(req, res, next) {
         if (!theatreId) {
             res.status(400).json({ success: false, message: 'theatreId is required.' });
             return;
+        }
+
+        if (currentUser.role === 'STAFF') {
+            const isAuth = await isUserAuthorizedForTheatre(currentUser, theatreId);
+            if (!isAuth) {
+                res.status(403).json({ success: false, message: 'Unauthorized: You cannot send messages on behalf of another theatre.' });
+                return;
+            }
         }
 
         if (!rawMessage && !req.file) {
@@ -354,6 +398,10 @@ export async function sendMessage(req, res, next) {
 }
 
 export async function streamChatMessageMedia(req, res, next) {
+    if (!isDBConnected()) {
+        res.status(404).send('Media not available in offline mode.');
+        return;
+    }
     try {
         const messageId = req.params.id;
         const chatMessage = await ChatMessage.findById(messageId);
@@ -374,9 +422,8 @@ export async function streamChatMessageMedia(req, res, next) {
         }
 
         if (user.role === 'STAFF') {
-            const isAssigned = await TheatreStaff.findOne({ theatre_id: theatreId, user_id: user.id });
-            const isOwner = await Theatre.findOne({ _id: theatreId, owner_id: user.id });
-            if (!isAssigned && !isOwner) {
+            const isAuth = await isUserAuthorizedForTheatre(user, theatreId);
+            if (!isAuth) {
                 res.status(403).json({ success: false, message: 'Unauthorized to view media for this theatre.' });
                 return;
             }

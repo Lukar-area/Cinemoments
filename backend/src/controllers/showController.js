@@ -1,17 +1,32 @@
+import mongoose from 'mongoose';
 import Show from '../models/Show.js';
 import Screen from '../models/Screen.js';
 import Movie from '../models/Movie.js';
 import Theatre from '../models/Theatre.js';
 import IntervalBooking from '../models/IntervalBooking.js';
+import { isDBConnected } from '../db/database.js';
+import { fallbackStore } from '../db/fallbackStore.js';
 
 export async function getShows(req, res, next) {
     try {
         const { theatreId, movieId, date } = req.query;
+
+        if (!isDBConnected()) {
+            const shows = fallbackStore.getShows({ theatreId, movieId, date });
+            res.json({ success: true, shows });
+            return;
+        }
+
+        if (theatreId && !mongoose.Types.ObjectId.isValid(theatreId)) {
+            const shows = fallbackStore.getShows({ theatreId, movieId, date });
+            res.json({ success: true, shows });
+            return;
+        }
+
         const todayStr = new Date().toISOString().split('T')[0];
+        const query = { status: 'SCHEDULED' };
 
-        const query = {};
-
-        if (movieId) {
+        if (movieId && mongoose.Types.ObjectId.isValid(movieId)) {
             query.movie_id = movieId;
         }
 
@@ -75,6 +90,7 @@ export async function getShows(req, res, next) {
                 duration: movie ? movie.duration : 0,
                 language: movie ? movie.language : '',
                 rating: movie ? movie.rating : '',
+                genre: movie ? movie.genre : '',
                 screen_id: screen ? screen._id.toString() : null,
                 screen_name: screen ? screen.name : '',
                 screen_type: screen ? screen.screen_type : 'STANDARD',
@@ -86,6 +102,14 @@ export async function getShows(req, res, next) {
                 pending_requests_count: pendingCountMap[sid] || 0,
             };
         });
+
+                if (formattedShows.length === 0) {
+            const fallbackShows = fallbackStore.getShows({ theatreId, movieId, date });
+            if (fallbackShows.length > 0) {
+                res.json({ success: true, shows: fallbackShows });
+                return;
+            }
+        }
 
         res.json({ success: true, shows: formattedShows });
     }

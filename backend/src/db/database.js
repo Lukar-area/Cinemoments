@@ -1,9 +1,6 @@
 import mongoose from 'mongoose';
 import { config } from '../config/index.js';
 
-// Disable query buffering so disconnected queries fail fast or leverage fallback stores
-mongoose.set('bufferCommands', false);
-
 /**
  * Connects to MongoDB Atlas using Mongoose.
  * Configured with connection pooling and error handling for production readiness.

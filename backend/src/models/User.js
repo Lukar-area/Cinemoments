@@ -24,6 +24,11 @@ const userSchema = new mongoose.Schema(
       enum: ['ACTIVE', 'INACTIVE', 'SUSPENDED'],
     },
     wallet_balance: { type: Number, required: true, default: 2000.0 },
+    theatre_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Theatre',
+      default: null,
+    },
   },
   {
     timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' },

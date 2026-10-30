@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { CheckCircle2, Printer, X, Film, ShieldCheck, Download, Sparkles, QrCode } from 'lucide-react';
 
 export const ReceiptModal = ({ receipt, onClose }) => {
+  useEffect(() => {
+    if (!receipt) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose?.();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [receipt, onClose]);
+
   if (!receipt) return null;
 
   const handlePrint = () => {
@@ -9,8 +23,15 @@ export const ReceiptModal = ({ receipt, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#301934]/70 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white border-2 border-[#CBC3E3] rounded-3xl shadow-2xl overflow-hidden my-8">
+    <div 
+      className="fixed inset-0 z-50 bg-[#301934]/70 backdrop-blur-md overflow-y-auto p-3 sm:p-4 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div className="min-h-full flex items-center justify-center py-4 sm:py-8">
+        <div 
+          className="relative w-full max-w-xl bg-white border-2 border-[#CBC3E3] rounded-3xl shadow-2xl overflow-hidden my-auto"
+          onClick={(e) => e.stopPropagation()}
+        >
         {/* Modal Top Bar */}
         <div className="flex items-center justify-between px-6 py-4 bg-[#F8F6FC] border-b border-[#E6E6FA]">
           <div className="flex items-center gap-2">
@@ -175,5 +196,6 @@ export const ReceiptModal = ({ receipt, onClose }) => {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };

@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import mongoose from 'mongoose';
+import { isDBConnected } from '../db/database.js';
+import { fallbackStore } from '../db/fallbackStore.js';
 import User from '../models/User.js';
 import Theatre from '../models/Theatre.js';
 import TheatreStaff from '../models/TheatreStaff.js';
@@ -19,6 +22,9 @@ import { config } from '../config/index.js';
  * Submits a new interval booking request with optional encrypted media.
  */
 export async function createBooking(input) {
+    if (!isDBConnected() || !mongoose.Types.ObjectId.isValid(input.showId)) {
+        return fallbackStore.createBooking(input);
+    }
     // Validate show exists
     const show = await Show.findById(input.showId)
         .populate('movie_id')
@@ -166,6 +172,9 @@ export async function createBooking(input) {
  * Accepts a booking request atomically.
  */
 export async function acceptBooking(bookingId, staffUserId, ipAddress) {
+    if (!isDBConnected() || !mongoose.Types.ObjectId.isValid(bookingId)) {
+        return fallbackStore.acceptBooking(bookingId);
+    }
     const booking = await IntervalBooking.findById(bookingId).populate({
         path: 'show_id',
         populate: [
@@ -284,6 +293,9 @@ export async function acceptBooking(bookingId, staffUserId, ipAddress) {
  * Rejects an interval booking request and refunds wallet balance.
  */
 export async function rejectBooking(bookingId, staffUserId, reason, ipAddress) {
+    if (!isDBConnected() || !mongoose.Types.ObjectId.isValid(bookingId)) {
+        return fallbackStore.rejectBooking(bookingId, reason);
+    }
     const booking = await IntervalBooking.findById(bookingId).populate({
         path: 'show_id',
         populate: [
@@ -342,6 +354,9 @@ export async function rejectBooking(bookingId, staffUserId, reason, ipAddress) {
  * Cancels a booking by the customer who submitted it and refunds wallet balance.
  */
 export async function cancelBooking(bookingId, customerUserId, ipAddress) {
+    if (!isDBConnected() || !mongoose.Types.ObjectId.isValid(bookingId)) {
+        return fallbackStore.cancelBooking(bookingId, customerUserId);
+    }
     const booking = await IntervalBooking.findById(bookingId);
     if (!booking) {
         const err = new Error('Booking was not found.');
@@ -417,6 +432,9 @@ export async function refundBookingTransaction(bookingId) {
 }
 
 export async function getUserTransactions(userId) {
+    if (!isDBConnected()) {
+        return fallbackStore.getUserTransactions(userId);
+    }
     const txs = await Transaction.find({ user_id: userId })
         .populate('theatre_id', 'name')
         .populate({
@@ -453,6 +471,9 @@ export async function getUserTransactions(userId) {
 }
 
 export async function getTheatreEarnings(theatreId) {
+    if (!theatreId || !mongoose.Types.ObjectId.isValid(theatreId)) {
+        return { totalEarnings: 0, totalVolume: 0, completedCount: 0, refundedCount: 0, transactions: [] };
+    }
     const txs = await Transaction.find({ theatre_id: theatreId })
         .populate('user_id', 'name email')
         .populate({
@@ -578,6 +599,9 @@ export async function getAllTransactions() {
  * Fetches booking details by ID.
  */
 export async function getBookingById(bookingId) {
+    if (!isDBConnected() || !mongoose.Types.ObjectId.isValid(bookingId)) {
+        return fallbackStore.getBookingById(bookingId);
+    }
     const booking = await IntervalBooking.findById(bookingId)
         .populate('user_id', 'name email')
         .populate({
@@ -632,6 +656,9 @@ export async function getBookingById(bookingId) {
  * Retrieves all bookings for a customer.
  */
 export async function getCustomerBookings(userId) {
+    if (!isDBConnected()) {
+        return fallbackStore.getBookings({ userId });
+    }
     const bookings = await IntervalBooking.find({ user_id: userId })
         .populate('user_id', 'name email')
         .populate({
@@ -694,6 +721,12 @@ export async function getCustomerBookings(userId) {
  * Retrieves bookings for theatre staff with optional filters.
  */
 export async function getStaffBookings(theatreId, filterStatus) {
+    if (!isDBConnected()) {
+        return fallbackStore.getBookings(theatreId, filterStatus);
+    }
+    if (!theatreId || !mongoose.Types.ObjectId.isValid(theatreId)) {
+        return [];
+    }
     const screens = await Screen.find({ theatre_id: theatreId }).select('_id');
     const screenIds = screens.map(s => s._id);
 

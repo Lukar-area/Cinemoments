@@ -6,6 +6,10 @@ const theatreSchema = new mongoose.Schema(
     location: { type: String, required: true },
     address: { type: String, required: true },
     city: { type: String, required: true },
+    contact_phone: { type: String, default: null },
+    contact_email: { type: String, default: null },
+    phone: { type: String, default: null },
+    email: { type: String, default: null },
     description: { type: String, default: null },
     image: { type: String, default: null },
     owner_id: {

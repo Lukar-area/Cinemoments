@@ -1,4 +1,5 @@
 const API_BASE = (import.meta.env.VITE_API_URL || '') + '/api';
+
 async function request(endpoint, options = {}) {
     const token = localStorage.getItem('token');
     const headers = {
@@ -21,6 +22,7 @@ async function request(endpoint, options = {}) {
     }
     return data;
 }
+
 export const api = {
     auth: {
         login: (credentials) => request('/auth/login', {
@@ -38,8 +40,21 @@ export const api = {
         me: () => request('/auth/me'),
     },
     theatres: {
-        getAll: () => request('/theatres'),
+        getAll: (params) => {
+            const search = new URLSearchParams();
+            if (params?.activeSchedulesOnly) search.set('activeSchedulesOnly', 'true');
+            if (params?.hasActiveShows) search.set('hasActiveShows', 'true');
+            const qs = search.toString();
+            return request(`/theatres${qs ? `?${qs}` : ''}`);
+        },
         getById: (id) => request(`/theatres/${id}`),
+        getStaffCurrent: (theatreId) =>
+            request(`/theatres/staff/current${theatreId ? `?theatreId=${theatreId}` : ''}`),
+        associateStaffTheatre: (data) =>
+            request('/theatres/staff/associate', {
+                method: 'POST',
+                body: JSON.stringify(data),
+            }),
         create: (data) => request('/theatres', {
             method: 'POST',
             body: JSON.stringify(data),
@@ -50,7 +65,12 @@ export const api = {
         }),
     },
     movies: {
-        getAll: () => request('/movies'),
+        getAll: (params) => {
+            const search = new URLSearchParams();
+            if (params?.theatreId) search.set('theatreId', params.theatreId.toString());
+            const qs = search.toString();
+            return request(`/movies${qs ? `?${qs}` : ''}`);
+        },
         getById: (id) => request(`/movies/${id}`),
         create: (data) => request('/movies', {
             method: 'POST',

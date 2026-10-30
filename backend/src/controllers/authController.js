@@ -7,6 +7,7 @@ import { config } from '../config/index.js';
 import { recordAuditLog } from '../services/auditService.js';
 import { generateCaptcha, verifyCaptcha } from '../services/captchaService.js';
 import { isDBConnected } from '../db/database.js';
+import { getAuthorizedTheatresForUser } from '../services/theatreAuthService.js';
 
 // Pre-seeded demo user definitions for instantaneous fallback when MongoDB Atlas / local mongod is offline
 const DEMO_USERS_MAP = new Map([
@@ -25,6 +26,15 @@ const DEMO_USERS_MAP = new Map([
         role: 'STAFF',
         wallet_balance: 5000.00,
         assignedTheatreId: 'theatre_grand_palace_1',
+        theatre: {
+            id: 'theatre_grand_palace_1',
+            name: 'Grand Palace Cinema',
+            location: 'Downtown Arts District',
+            address: '450 Heritage Blvd',
+            city: 'Mumbai',
+            contact_phone: '+91 22 2845 1100',
+            contact_email: 'info@grandpalacecinema.com',
+        },
     }],
     ['staff@starlight.com', {
         id: '67123456789abcdef0000003',
@@ -33,6 +43,15 @@ const DEMO_USERS_MAP = new Map([
         role: 'STAFF',
         wallet_balance: 5000.00,
         assignedTheatreId: 'theatre_starlight_2',
+        theatre: {
+            id: 'theatre_starlight_2',
+            name: 'Starlight Multiplex',
+            location: 'Westside Promenade',
+            address: '780 Boulevard Walk',
+            city: 'Delhi',
+            contact_phone: '+91 11 4150 9922',
+            contact_email: 'contact@starlightmultiplex.com',
+        },
     }],
     ['staff@apexcine.com', {
         id: '67123456789abcdef0000004',
@@ -41,6 +60,15 @@ const DEMO_USERS_MAP = new Map([
         role: 'STAFF',
         wallet_balance: 5000.00,
         assignedTheatreId: 'theatre_apexcine_3',
+        theatre: {
+            id: 'theatre_apexcine_3',
+            name: 'Apex Cineplex & IMAX',
+            location: 'Tech Corridor',
+            address: '1200 Innovation Way',
+            city: 'Bengaluru',
+            contact_phone: '+91 80 6720 4455',
+            contact_email: 'desk@apexcine.com',
+        },
     }],
     ['staff@regalcrown.com', {
         id: '67123456789abcdef0000005',
@@ -49,6 +77,15 @@ const DEMO_USERS_MAP = new Map([
         role: 'STAFF',
         wallet_balance: 5000.00,
         assignedTheatreId: 'theatre_regalcrown_4',
+        theatre: {
+            id: 'theatre_regalcrown_4',
+            name: 'Regal Crown Cinema',
+            location: 'Marine Plaza Waterfront',
+            address: '102 Royal Palm Drive',
+            city: 'Mumbai',
+            contact_phone: '+91 22 6677 8899',
+            contact_email: 'support@regalcrown.com',
+        },
     }],
     ['rahul@example.com', {
         id: '67123456789abcdef0000006',
@@ -76,8 +113,104 @@ const DEMO_USERS_MAP = new Map([
     }],
 ]);
 
-// Dynamic in-memory user registry for offline/testing registration
+// Dynamic in-memory user & theatre registries for offline/testing registration
 const inMemoryUsers = new Map();
+const inMemoryTheatres = new Map();
+
+export function getInMemoryUserById(id) {
+    if (!id) return null;
+    for (const u of inMemoryUsers.values()) {
+        if (u.id === id) return u;
+    }
+    for (const d of DEMO_USERS_MAP.values()) {
+        if (d.id === id) return d;
+    }
+    return null;
+}
+
+export function updateUserWalletBalance(id, newBalance) {
+    if (!id) return false;
+    for (const u of inMemoryUsers.values()) {
+        if (u.id === id) {
+            u.wallet_balance = newBalance;
+            return true;
+        }
+    }
+    for (const d of DEMO_USERS_MAP.values()) {
+        if (d.id === id) {
+            d.wallet_balance = newBalance;
+            return true;
+        }
+    }
+    return false;
+}
+
+export function getAllInMemoryAndDemoUsers() {
+    const list = [];
+    const seenIds = new Set();
+
+    for (const d of DEMO_USERS_MAP.values()) {
+        if (!seenIds.has(d.id)) {
+            seenIds.add(d.id);
+            list.push({
+                id: d.id,
+                name: d.name,
+                email: d.email,
+                phone: d.phone || null,
+                role: d.role,
+                status: d.status || 'ACTIVE',
+                wallet_balance: Number(d.wallet_balance || 0),
+                created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
+                updated_at: new Date().toISOString(),
+            });
+        }
+    }
+
+    for (const u of inMemoryUsers.values()) {
+        if (!seenIds.has(u.id)) {
+            seenIds.add(u.id);
+            list.push({
+                id: u.id,
+                name: u.name,
+                email: u.email,
+                phone: u.phone || null,
+                role: u.role,
+                status: u.status || 'ACTIVE',
+                wallet_balance: Number(u.wallet_balance || 0),
+                created_at: u.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            });
+        }
+    }
+
+    return list;
+}
+
+export function updateInMemoryUserStatusOrRole(id, { role, status }) {
+    if (!id) return false;
+    for (const u of inMemoryUsers.values()) {
+        if (u.id === id) {
+            if (role) u.role = role;
+            if (status) u.status = status;
+            return true;
+        }
+    }
+    for (const d of DEMO_USERS_MAP.values()) {
+        if (d.id === id) {
+            if (role) d.role = role;
+            if (status) d.status = status;
+            return true;
+        }
+    }
+    return false;
+}
+
+export function getInMemoryTheatreById(id) {
+    for (const t of inMemoryTheatres.values()) {
+        if (t.id === id) return t;
+    }
+    return null;
+}
 
 export async function getCaptcha(req, res, next) {
     try {
@@ -94,17 +227,80 @@ export async function getCaptcha(req, res, next) {
 
 export async function register(req, res, next) {
     try {
-        const { name, email, phone, password, role = 'CUSTOMER' } = req.body;
+        const {
+            name,
+            email,
+            phone,
+            password,
+            confirmPassword,
+            role = 'CUSTOMER',
+            theatreName,
+            theatreLocation,
+            theatreAddress,
+            city,
+            theatrePhone,
+            theatreEmail,
+        } = req.body;
+
         if (!name || !email || !password) {
             res.status(400).json({ success: false, message: 'Name, email, and password are required.' });
             return;
         }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const normalizedEmail = email.toLowerCase().trim();
+        if (!emailRegex.test(normalizedEmail)) {
+            res.status(400).json({ success: false, message: 'Please enter a valid email address.' });
+            return;
+        }
+
         if (password.length < 8) {
             res.status(400).json({ success: false, message: 'Password must be at least 8 characters long.' });
             return;
         }
-        const normalizedEmail = email.toLowerCase().trim();
+
+        if (confirmPassword && confirmPassword !== password) {
+            res.status(400).json({ success: false, message: 'Passwords do not match.' });
+            return;
+        }
+
         const userRole = role === 'STAFF' ? 'STAFF' : 'CUSTOMER';
+
+        // Additional validations for THEATRE STAFF registration
+        let tName = '';
+        let tLoc = '';
+        let tAddr = '';
+        let tCity = '';
+        let tPhone = '';
+        let tEmail = '';
+
+        if (userRole === 'STAFF') {
+            tName = (theatreName || req.body.theatre_name || '').trim();
+            tLoc = (theatreLocation || req.body.theatre_location || '').trim();
+            tAddr = (theatreAddress || req.body.theatre_address || '').trim();
+            tCity = (city || req.body.theatre_city || '').trim();
+            tPhone = (theatrePhone || req.body.theatre_phone || req.body.theatreContactNumber || req.body.contact_phone || '').trim();
+            tEmail = (theatreEmail || req.body.theatre_email || req.body.theatreEmailAddress || req.body.contact_email || '').trim().toLowerCase();
+
+            if (!phone || !phone.trim()) {
+                res.status(400).json({ success: false, message: 'Staff phone number is required.' });
+                return;
+            }
+
+            if (!tName || !tLoc || !tAddr || !tCity || !tPhone || !tEmail) {
+                res.status(400).json({
+                    success: false,
+                    message: 'All theatre details (Theatre Name, Location, Address, City, Contact Number, and Email Address) are required.',
+                });
+                return;
+            }
+
+            if (!emailRegex.test(tEmail)) {
+                res.status(400).json({ success: false, message: 'Please provide a valid theatre email address.' });
+                return;
+            }
+        }
+
         const passwordHash = await bcrypt.hash(password, 10);
 
         if (isDBConnected()) {
@@ -117,7 +313,7 @@ export async function register(req, res, next) {
             const newUser = await User.create({
                 name: name.trim(),
                 email: normalizedEmail,
-                phone: phone || null,
+                phone: phone ? phone.trim() : null,
                 password_hash: passwordHash,
                 role: userRole,
                 status: 'ACTIVE',
@@ -125,6 +321,63 @@ export async function register(req, res, next) {
             });
 
             const newUserId = newUser._id.toString();
+            let targetTheatre = null;
+
+            if (userRole === 'STAFF') {
+                // Check if a theatre with the same name and address already exists (case-insensitive)
+                const escapedName = tName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const escapedAddr = tAddr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+                const existingTheatre = await Theatre.findOne({
+                    name: { $regex: new RegExp(`^${escapedName}$`, 'i') },
+                    address: { $regex: new RegExp(`^${escapedAddr}$`, 'i') },
+                });
+
+                if (existingTheatre) {
+                    // Staff joins the existing theatre!
+                    targetTheatre = existingTheatre;
+
+                    // Update contact information if not set
+                    let updated = false;
+                    if (!targetTheatre.contact_phone && tPhone) {
+                        targetTheatre.contact_phone = tPhone;
+                        targetTheatre.phone = tPhone;
+                        updated = true;
+                    }
+                    if (!targetTheatre.contact_email && tEmail) {
+                        targetTheatre.contact_email = tEmail;
+                        targetTheatre.email = tEmail;
+                        updated = true;
+                    }
+                    if (updated) await targetTheatre.save();
+                } else {
+                    // Create new theatre record with registering staff as initial owner
+                    targetTheatre = await Theatre.create({
+                        name: tName,
+                        location: tLoc,
+                        address: tAddr,
+                        city: tCity,
+                        contact_phone: tPhone,
+                        contact_email: tEmail,
+                        phone: tPhone,
+                        email: tEmail,
+                        owner_id: newUser._id,
+                        status: 'ACTIVE',
+                    });
+                }
+
+                // Associate user with theatre in User model
+                newUser.theatre_id = targetTheatre._id;
+                await newUser.save();
+
+                // Create or update TheatreStaff mapping record
+                await TheatreStaff.findOneAndUpdate(
+                    { theatre_id: targetTheatre._id, user_id: newUser._id },
+                    { theatre_id: targetTheatre._id, user_id: newUser._id },
+                    { upsert: true, new: true }
+                );
+            }
+
             const token = jwt.sign({ id: newUserId, role: userRole }, config.jwtSecret, { expiresIn: '7d' });
 
             await recordAuditLog({
@@ -133,18 +386,36 @@ export async function register(req, res, next) {
                 entityType: 'user',
                 entityId: newUserId,
                 ipAddress: req.ip,
+                details: { role: userRole, theatreId: targetTheatre ? targetTheatre._id.toString() : null },
             });
+
+            const formattedTheatre = targetTheatre ? {
+                id: targetTheatre._id.toString(),
+                name: targetTheatre.name,
+                location: targetTheatre.location,
+                address: targetTheatre.address,
+                city: targetTheatre.city,
+                contact_phone: targetTheatre.contact_phone || targetTheatre.phone || null,
+                contact_email: targetTheatre.contact_email || targetTheatre.email || null,
+            } : null;
 
             res.status(201).json({
                 success: true,
-                message: 'Account registered successfully. Received ₹2,000 demo wallet balance!',
+                message: userRole === 'STAFF'
+                    ? `Theatre Staff account registered successfully and linked to ${targetTheatre.name}.`
+                    : 'Account registered successfully. Received ₹2,000 demo wallet balance!',
                 token,
                 user: {
                     id: newUserId,
                     name: newUser.name,
                     email: newUser.email,
+                    phone: newUser.phone,
                     role: userRole,
                     wallet_balance: 2000.00,
+                    theatre_id: targetTheatre ? targetTheatre._id.toString() : null,
+                    assignedTheatreId: targetTheatre ? targetTheatre._id.toString() : null,
+                    theatre: formattedTheatre,
+                    assignedTheatres: formattedTheatre ? [formattedTheatre] : [],
                 },
             });
         } else {
@@ -155,15 +426,39 @@ export async function register(req, res, next) {
             }
 
             const inMemId = `mem_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+            let memTheatre = null;
+
+            if (userRole === 'STAFF') {
+                const theatreKey = `${tName.toLowerCase()}_${tAddr.toLowerCase()}`;
+                if (inMemoryTheatres.has(theatreKey)) {
+                    memTheatre = inMemoryTheatres.get(theatreKey);
+                } else {
+                    memTheatre = {
+                        id: `theatre_mem_${Date.now()}`,
+                        name: tName,
+                        location: tLoc,
+                        address: tAddr,
+                        city: tCity,
+                        contact_phone: tPhone,
+                        contact_email: tEmail,
+                    };
+                    inMemoryTheatres.set(theatreKey, memTheatre);
+                }
+            }
+
             const userObj = {
                 id: inMemId,
                 name: name.trim(),
                 email: normalizedEmail,
-                phone: phone || null,
+                phone: phone ? phone.trim() : null,
                 password_hash: passwordHash,
                 role: userRole,
                 status: 'ACTIVE',
                 wallet_balance: 2000.00,
+                theatre_id: memTheatre ? memTheatre.id : null,
+                assignedTheatreId: memTheatre ? memTheatre.id : null,
+                theatre: memTheatre,
+                assignedTheatres: memTheatre ? [memTheatre] : [],
             };
             inMemoryUsers.set(normalizedEmail, userObj);
 
@@ -171,14 +466,21 @@ export async function register(req, res, next) {
 
             res.status(201).json({
                 success: true,
-                message: 'Account registered successfully. Received ₹2,000 demo wallet balance!',
+                message: userRole === 'STAFF'
+                    ? `Theatre Staff account registered successfully and linked to ${memTheatre.name}.`
+                    : 'Account registered successfully. Received ₹2,000 demo wallet balance!',
                 token,
                 user: {
                     id: inMemId,
                     name: userObj.name,
                     email: userObj.email,
+                    phone: userObj.phone,
                     role: userRole,
                     wallet_balance: 2000.00,
+                    theatre_id: memTheatre ? memTheatre.id : null,
+                    assignedTheatreId: memTheatre ? memTheatre.id : null,
+                    theatre: memTheatre,
+                    assignedTheatres: memTheatre ? [memTheatre] : [],
                 },
             });
         }
@@ -189,63 +491,27 @@ export async function register(req, res, next) {
 
 export async function guestLogin(req, res, next) {
     try {
-        const guestId = Math.floor(1000 + Math.random() * 9000);
-        const guestName = `Guest User #${guestId}`;
-        const guestEmail = `guest_${Date.now()}_${guestId}@cinemoments.internal`;
-        const tempPasswordHash = await bcrypt.hash(`GuestPass_${Date.now()}!`, 10);
+        const guestId = `guest_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+        const guestUser = {
+            id: guestId,
+            name: 'Guest Director',
+            email: `${guestId}@cinemoments.guest`,
+            role: 'CUSTOMER',
+            wallet_balance: 2000.00,
+        };
 
-        if (isDBConnected()) {
-            const newUser = await User.create({
-                name: guestName,
-                email: guestEmail,
-                phone: null,
-                password_hash: tempPasswordHash,
-                role: 'CUSTOMER',
-                status: 'ACTIVE',
-                wallet_balance: 2000.00,
-            });
+        const token = jwt.sign(
+            { id: guestId, role: 'CUSTOMER', isGuest: true },
+            config.jwtSecret,
+            { expiresIn: '7d' }
+        );
 
-            const newUserId = newUser._id.toString();
-            const token = jwt.sign({ id: newUserId, role: 'CUSTOMER' }, config.jwtSecret, { expiresIn: '7d' });
-
-            await recordAuditLog({
-                userId: newUserId,
-                action: 'GUEST_LOGIN',
-                entityType: 'user',
-                entityId: newUserId,
-                ipAddress: req.ip,
-            });
-
-            res.status(200).json({
-                success: true,
-                message: 'Logged in as Guest! Credited ₹2,000 fake balance for transactions.',
-                token,
-                user: {
-                    id: newUserId,
-                    name: guestName,
-                    email: guestEmail,
-                    role: 'CUSTOMER',
-                    wallet_balance: 2000.00,
-                },
-            });
-        } else {
-            // Fast in-memory guest session fallback
-            const memGuestId = `guest_${Date.now()}_${guestId}`;
-            const token = jwt.sign({ id: memGuestId, role: 'CUSTOMER' }, config.jwtSecret, { expiresIn: '7d' });
-
-            res.status(200).json({
-                success: true,
-                message: 'Logged in as Guest! Credited ₹2,000 demo balance for transactions.',
-                token,
-                user: {
-                    id: memGuestId,
-                    name: guestName,
-                    email: guestEmail,
-                    role: 'CUSTOMER',
-                    wallet_balance: 2000.00,
-                },
-            });
-        }
+        res.json({
+            success: true,
+            message: 'Guest session initialized with ₹2,000 demo balance.',
+            token,
+            user: guestUser,
+        });
     } catch (error) {
         next(error);
     }
@@ -323,18 +589,20 @@ export async function login(req, res, next) {
                 ipAddress: req.ip,
             });
 
-            let assignedTheatreId = null;
-            if (user.role === 'STAFF') {
-                const staffRow = await TheatreStaff.findOne({ user_id: user._id });
-                if (staffRow) {
-                    assignedTheatreId = staffRow.theatre_id.toString();
-                } else {
-                    const ownerRow = await Theatre.findOne({ owner_id: user._id });
-                    if (ownerRow) {
-                        assignedTheatreId = ownerRow._id.toString();
-                    }
-                }
-            }
+            // Retrieve authorized theatres for this user
+            const authorizedTheatres = await getAuthorizedTheatresForUser(user);
+            const formattedTheatres = authorizedTheatres.map(t => ({
+                id: t._id ? t._id.toString() : t.id,
+                name: t.name,
+                location: t.location,
+                address: t.address,
+                city: t.city,
+                contact_phone: t.contact_phone || t.phone || null,
+                contact_email: t.contact_email || t.email || null,
+            }));
+
+            const primaryTheatre = formattedTheatres[0] || null;
+            const assignedTheatreId = primaryTheatre ? primaryTheatre.id : null;
 
             res.json({
                 success: true,
@@ -344,9 +612,13 @@ export async function login(req, res, next) {
                     id: userId,
                     name: user.name,
                     email: user.email,
+                    phone: user.phone,
                     role: user.role,
                     wallet_balance: Number(user.wallet_balance || 0),
+                    theatre_id: assignedTheatreId,
                     assignedTheatreId,
+                    theatre: primaryTheatre,
+                    assignedTheatres: formattedTheatres,
                 },
             });
             return;
@@ -383,9 +655,13 @@ export async function login(req, res, next) {
                 id: resolvedUser.id,
                 name: resolvedUser.name,
                 email: resolvedUser.email,
+                phone: resolvedUser.phone || null,
                 role: resolvedUser.role,
                 wallet_balance: Number(resolvedUser.wallet_balance || 0),
+                theatre_id: resolvedUser.assignedTheatreId || null,
                 assignedTheatreId: resolvedUser.assignedTheatreId || null,
+                theatre: resolvedUser.theatre || null,
+                assignedTheatres: resolvedUser.assignedTheatres || (resolvedUser.theatre ? [resolvedUser.theatre] : []),
             },
         });
     } catch (error) {
@@ -402,26 +678,38 @@ export async function getCurrentUser(req, res) {
     try {
         if (isDBConnected()) {
             const freshUser = await User.findById(req.user.id);
-
-            let assignedTheatreId = null;
-            if (req.user.role === 'STAFF') {
-                const staffRow = await TheatreStaff.findOne({ user_id: req.user.id });
-                if (staffRow) {
-                    assignedTheatreId = staffRow.theatre_id.toString();
-                } else {
-                    const ownerRow = await Theatre.findOne({ owner_id: req.user.id });
-                    if (ownerRow) {
-                        assignedTheatreId = ownerRow._id.toString();
-                    }
-                }
+            if (!freshUser) {
+                res.status(404).json({ success: false, message: 'User not found.' });
+                return;
             }
+
+            const authorizedTheatres = await getAuthorizedTheatresForUser(freshUser);
+            const formattedTheatres = authorizedTheatres.map(t => ({
+                id: t._id ? t._id.toString() : t.id,
+                name: t.name,
+                location: t.location,
+                address: t.address,
+                city: t.city,
+                contact_phone: t.contact_phone || t.phone || null,
+                contact_email: t.contact_email || t.email || null,
+            }));
+
+            const primaryTheatre = formattedTheatres[0] || null;
+            const assignedTheatreId = primaryTheatre ? primaryTheatre.id : null;
 
             res.json({
                 success: true,
                 user: {
-                    ...req.user,
-                    wallet_balance: freshUser ? Number(freshUser.wallet_balance || 0) : Number(req.user.wallet_balance || 0),
+                    id: freshUser._id.toString(),
+                    name: freshUser.name,
+                    email: freshUser.email,
+                    phone: freshUser.phone,
+                    role: freshUser.role,
+                    wallet_balance: Number(freshUser.wallet_balance || 0),
+                    theatre_id: assignedTheatreId,
                     assignedTheatreId,
+                    theatre: primaryTheatre,
+                    assignedTheatres: formattedTheatres,
                 },
             });
             return;

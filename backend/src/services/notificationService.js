@@ -1,3 +1,4 @@
+import { isDBConnected } from '../db/database.js';
 import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import IntervalBooking from '../models/IntervalBooking.js';
@@ -18,6 +19,9 @@ import {
  * Creates an in-app notification for a user and dispatches email/SMS alerts based on notification type.
  */
 export async function createNotification(userId, bookingId, title, message, type = 'GENERAL', metadata = {}) {
+    if (!isDBConnected()) {
+        return null;
+    }
     try {
         const notif = await Notification.create({
             user_id: userId,
@@ -43,6 +47,9 @@ export async function createNotification(userId, bookingId, title, message, type
  * Internal async dispatcher for Email and SMS
  */
 async function dispatchExternalAlerts(userId, bookingId, title, message, type, metadata = {}) {
+    if (!isDBConnected()) {
+        return;
+    }
     try {
         const user = await User.findById(userId);
         if (!user) return;

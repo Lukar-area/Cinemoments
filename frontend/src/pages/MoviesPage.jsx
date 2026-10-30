@@ -16,8 +16,8 @@ export const MoviesPage = () => {
           api.movies.getAll(),
           api.shows.getShows(),
         ]);
-        setMovies(movieRes.movies);
-        setShows(showRes.shows);
+        setMovies(movieRes?.movies || []);
+        setShows(showRes?.shows || []);
       } catch (err) {
         console.error('Failed to load movies data:', err);
       } finally {
@@ -27,11 +27,11 @@ export const MoviesPage = () => {
     loadMoviesAndShows();
   }, []);
 
-  const filteredMovies = movies.filter(
+  const filteredMovies = (movies || []).filter(
     (m) =>
-      m.title.toLowerCase().includes(search.toLowerCase()) ||
-      m.genre.toLowerCase().includes(search.toLowerCase()) ||
-      m.language.toLowerCase().includes(search.toLowerCase())
+      (m?.title || '').toLowerCase().includes(search.toLowerCase()) ||
+      (m?.genre || '').toLowerCase().includes(search.toLowerCase()) ||
+      (m?.language || '').toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -79,7 +79,11 @@ export const MoviesPage = () => {
       ) : (
         <div className="space-y-10">
           {filteredMovies.map((movie) => {
-            const movieShows = shows.filter((s) => s.movie_id === movie.id);
+            const movieShows = (shows || []).filter((s) => {
+              const mid = s.movie_id?._id?.toString() || s.movie_id?.toString() || s.movie_id;
+              const targetMid = movie.id?.toString() || movie._id?.toString();
+              return mid === targetMid;
+            });
             return (
               <div
                 key={movie.id}
@@ -156,7 +160,7 @@ export const MoviesPage = () => {
                           </div>
 
                           <Link
-                            to={show.is_interval_booked ? '#' : `/book?showId=${show.id}`}
+                            to={show.is_interval_booked ? '#' : `/book?theatreId=${show.theatre_id}&movieId=${movie.id}&showId=${show.id}`}
                             className={`px-4 py-2 rounded-xl text-xs font-mono font-bold shrink-0 transition-all uppercase tracking-wider ${
                               show.is_interval_booked
                                 ? 'bg-[#E6E6FA] text-[#AA98A9] cursor-not-allowed'

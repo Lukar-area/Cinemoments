@@ -8,9 +8,19 @@ import Transaction from '../models/Transaction.js';
 import AuditLog from '../models/AuditLog.js';
 import BookingMedia from '../models/BookingMedia.js';
 import { recordAuditLog } from '../services/auditService.js';
+import { isDBConnected } from '../db/database.js';
+import { fallbackStore } from '../db/fallbackStore.js';
+import { getAllInMemoryAndDemoUsers, updateInMemoryUserStatusOrRole } from './authController.js';
 
 export async function getSystemStats(req, res, next) {
     try {
+        if (!isDBConnected()) {
+            res.json({
+                success: true,
+                stats: fallbackStore.getStats(),
+            });
+            return;
+        }
         const [
             usersCount,
             theatresCount,
@@ -80,6 +90,13 @@ export async function getSystemStats(req, res, next) {
 
 export async function getAllUsers(req, res, next) {
     try {
+        if (!isDBConnected()) {
+            res.json({
+                success: true,
+                users: getAllInMemoryAndDemoUsers(),
+            });
+            return;
+        }
         const users = await User.find()
             .select('name email phone role status wallet_balance created_at updated_at')
             .sort({ created_at: -1 });
@@ -93,6 +110,11 @@ export async function getAllUsers(req, res, next) {
 
 export async function updateUserStatusOrRole(req, res, next) {
     try {
+        if (!isDBConnected()) {
+            updateInMemoryUserStatusOrRole(req.params.id, req.body);
+            res.json({ success: true, message: 'User updated successfully.' });
+            return;
+        }
         const targetUserId = req.params.id;
         const { role, status } = req.body;
 
@@ -120,6 +142,13 @@ export async function updateUserStatusOrRole(req, res, next) {
 
 export async function getAuditLogsController(req, res, next) {
     try {
+        if (!isDBConnected()) {
+            res.json({
+                success: true,
+                logs: [],
+            });
+            return;
+        }
         const limit = parseInt(req.query.limit, 10) || 50;
 
         const logs = await AuditLog.find()
@@ -152,6 +181,13 @@ export async function getAuditLogsController(req, res, next) {
 
 export async function getAllBookingsAdmin(req, res, next) {
     try {
+        if (!isDBConnected()) {
+            res.json({
+                success: true,
+                bookings: fallbackStore.getBookings(),
+            });
+            return;
+        }
         const bookings = await IntervalBooking.find()
             .populate('user_id', 'name email')
             .populate({

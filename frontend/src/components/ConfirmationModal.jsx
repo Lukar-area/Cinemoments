@@ -8,8 +8,16 @@ export const ConfirmationModal = ({ isOpen, title, description, confirmLabel = '
         success: 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30',
         warning: 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/30',
     }[confirmVariant];
-    return (<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-150">
-      <div className="w-full max-w-md rounded-3xl bg-white border-2 border-[#CBC3E3] shadow-2xl p-6">
+    return (
+      <div 
+        className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-150"
+        onClick={onClose}
+      >
+        <div className="min-h-full flex items-center justify-center py-4">
+          <div 
+            className="w-full max-w-md rounded-3xl bg-white border-2 border-[#CBC3E3] shadow-2xl p-6 my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className={`p-2.5 rounded-xl ${confirmVariant === 'success'
@@ -44,5 +52,6 @@ export const ConfirmationModal = ({ isOpen, title, description, confirmLabel = '
           </button>
         </div>
       </div>
-    </div>);
+    </div>
+  </div>);
 };

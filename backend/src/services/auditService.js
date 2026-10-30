@@ -1,9 +1,13 @@
 import AuditLog from '../models/AuditLog.js';
+import { isDBConnected } from '../db/database.js';
 
 /**
  * Inserts an immutable audit record for security and administrative monitoring.
  */
 export async function recordAuditLog(entry) {
+    if (!isDBConnected()) {
+        return;
+    }
     try {
         const detailsStr = entry.details ? (typeof entry.details === 'object' ? JSON.stringify(entry.details) : String(entry.details)) : null;
         await AuditLog.create({
